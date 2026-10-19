@@ -1,0 +1,178 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="row mt-3">
+    <h1 class="col-6 offset-3">Sign Up on CampusAwaaz</h1>
+
+    <div class="col-6 offset-3">
+        <form action="/user/signup" method="POST" class="needs-validation" novalidate>
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input id="name" name="name" type="text"
+                    placeholder="Enter your full name" class="form-control" required>
+                <div class="valid-feedback">Looks Good!</div>
+                <div class="invalid-feedback">Enter your name</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">College Email</label>
+                <input id="email" name="email" type="email"
+                    placeholder="Enter your college email" class="form-control" required>
+                <div class="valid-feedback">Looks Good!</div>
+                <div class="invalid-feedback">Enter a valid email</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input id="password" name="password" type="password"
+                    placeholder="Create a password" class="form-control" required>
+                <div class="valid-feedback">Looks Good!</div>
+                <div class="invalid-feedback">Enter a password</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="rollNo" class="form-label">Roll Number</label>
+                <input id="rollNo" name="rollNo" type="text"
+                    placeholder="Enter your roll number" class="form-control" required>
+                <div class="valid-feedback">Looks Good!</div>
+                <div class="invalid-feedback">Enter your roll number</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="year" class="form-label">Year</label>
+                <select id="year" name="year" class="form-select" required>
+                    <option value="">Select your year</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                </select>
+                <div class="invalid-feedback">Select your year</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="section" class="form-label">Section</label>
+                <input id="section" name="section" type="text"
+                    placeholder="Enter your section" class="form-control" required>
+                <div class="invalid-feedback">Enter your section</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="branch" class="form-label">Branch</label>
+                <select id="branch" name="branch" class="form-select" required>
+                    <option value="">Select your branch</option>
+                    <option value="CSE">CSE</option>
+                    <option value="CSE (AI & DS)">CSE (AI & DS)</option>
+                    <option value="MNC">MNC</option>
+                    <option value="ECE">ECE</option>
+                    <option value="EEE">EEE</option>
+                    <option value="Mechanical">Mechanical</option>
+                    <option value="Civil">Civil</option>
+                    <option value="Chemical">Chemical</option>
+                    <option value="Biotechnology">Biotechnology</option>
+                    <option value="Metallurgical and Materials Engineering">
+                        Metallurgical and Materials Engineering
+                    </option>
+                </select>
+                <div class="invalid-feedback">Select your branch</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="hostel" class="form-label">Hostel</label>
+                <select id="hostel" name="hostel" class="form-select" required>
+                    <option value="">Select your hostel</option>
+                    <option value="LH">LH</option>
+                    <option value="Blocks">Blocks</option>
+                    <option value="1.8k">1.8K</option>
+                </select>
+                <div class="invalid-feedback">Select your hostel</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Clubs (Optional)</label>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="Aarohan" id="club1">
+                    <label class="form-check-label" for="club1">Aarohan</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="Dance and Dramatics Club" id="club2">
+                    <label class="form-check-label" for="club2">Dance and Dramatics Club</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="E-Cell" id="club3">
+                    <label class="form-check-label" for="club3">E-Cell</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="Fine Arts Club" id="club4">
+                    <label class="form-check-label" for="club4">Fine Arts Club</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="IEEE Student Branch" id="club5">
+                    <label class="form-check-label" for="club5">IEEE Student Branch</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="ISTE" id="club6">
+                    <label class="form-check-label" for="club6">ISTE</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="Literary Club" id="club7">
+                    <label class="form-check-label" for="club7">Literary Club</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="Music Club" id="club8">
+                    <label class="form-check-label" for="club8">Music Club</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="Photography Club" id="club9">
+                    <label class="form-check-label" for="club9">Photography Club</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="Quiz Club" id="club10">
+                    <label class="form-check-label" for="club10">Quiz Club</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="Robotics Club" id="club11">
+                    <label class="form-check-label" for="club11">Robotics Club</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="SAE" id="club12">
+                    <label class="form-check-label" for="club12">SAE</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="SPIC MACAY" id="club13">
+                    <label class="form-check-label" for="club13">SPIC MACAY</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="Sports Club" id="club14">
+                    <label class="form-check-label" for="club14">Sports Club</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="clubs" value="TEDx NIT Warangal" id="club15">
+                    <label class="form-check-label" for="club15">TEDx NIT Warangal</label>
+                </div>
+            </div>
+
+            <button class="btn btn-success">Sign Up</button>
+
+        </form>
+
+        <p class="mt-3">
+            Already registered? <a href="/user/login">Login here</a>
+        </p>
+    </div>
+</div>
