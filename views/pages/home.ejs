@@ -1,13 +1,236 @@
-<% layout("/layouts/boilerplate") -%>
-<div class="container mt-5 text-center">
-    <h1>Welcome to CampusAwaaz!</h1>
-    <p class="lead">
-        Your campus, your voice.
-    </p>
-    <% if (!currUser) { %>
-        <a href="/user/signup" class="btn btn-success">Sign Up</a>
-        <a href="/user/login" class="btn btn-outline-success">Login</a>
-    <% } else { %>
-        <h4>Welcome, <%= currUser.name %>!</h4>
-    <% } %>
+<% layout("/layouts/boilerplate") %>
+
+<div class="campus-dashboard">
+    <main class="main-content">
+        <div class="dashboard-content">
+            <div class="dashboard-grid">
+                <section class="feed-section">
+                    <div class="welcome-section">
+                        <span class="welcome-label">YOUR CAMPUS, YOUR COMMUNITY</span>
+                        <h1>Your campus, in the loop.</h1>
+                        <p>The updates, conversations, and help you need! All in one place.</p>
+                    </div>
+
+                    <form action="/search" method="GET" class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" name="q" placeholder="Search announcements, complaints, lost items...">
+                        <button type="submit" aria-label="Search">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <div class="quick-access">
+                        <a href="/announcements" class="quick-card">
+                            <div class="quick-icon mint">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </div>
+                            <h6>Announcements</h6>
+                            <p>Latest notices & events</p>
+                            <i class="fa-solid fa-chevron-right card-arrow"></i>
+                        </a>
+
+                        <a href="/complaints" class="quick-card">
+                            <div class="quick-icon peach">
+                                <i class="fa-regular fa-clipboard"></i>
+                            </div>
+                            <h6>Report an issue</h6>
+                            <p>Submit a complaint</p>
+                            <i class="fa-solid fa-chevron-right card-arrow"></i>
+                        </a>
+
+                        <a href="/lost-found" class="quick-card">
+                            <div class="quick-icon lavender">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </div>
+                            <h6>Lost & Found</h6>
+                            <p>Find or report lost items</p>
+                            <i class="fa-solid fa-chevron-right card-arrow"></i>
+                        </a>
+
+                        <a href="/timetable" class="quick-card">
+                            <div class="quick-icon blue">
+                                <i class="fa-regular fa-calendar-days"></i>
+                            </div>
+                            <h6>Timetables</h6>
+                            <p>Check your class schedule</p>
+                            <i class="fa-solid fa-chevron-right card-arrow"></i>
+                        </a>
+                    </div>
+
+                    <div class="feed-container">
+                        <div class="feed-header">
+                            <div class="feed-tabs">
+                                <button class="feed-tab active" type="button">For you</button>
+                                <button class="feed-tab" type="button">Trending</button>
+                                <button class="feed-tab" type="button">Campus life</button>
+                            </div>
+                            <select class="sort-select" aria-label="Sort posts">
+                                <option>Latest</option>
+                                <option>Oldest</option>
+                            </select>
+                        </div>
+
+                        <article class="post-card">
+                            <div class="post-heading">
+                                <div class="post-icon peach">
+                                    <i class="fa-solid fa-wrench"></i>
+                                </div>
+                                <div class="post-author">
+                                    <span class="category-badge peach">Facilities</span>
+                                    <h5>Water supply maintenance — Block 3</h5>
+                                    <p>
+                                        <i class="fa-solid fa-building-columns"></i>
+                                        Campus Facilities
+                                    </p>
+                                </div>
+                                <span class="post-time">2 hours ago</span>
+                            </div>
+
+                            <p class="post-description">
+                                The water supply in Block 3 will be under maintenance tomorrow from 9 AM to 12 PM.
+                                Please plan accordingly.
+                            </p>
+
+                            <div class="post-actions">
+                                <button type="button">
+                                    <i class="fa-regular fa-square-plus"></i>
+                                    Upvote
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="post-card">
+                            <div class="post-heading">
+                                <div class="post-icon lavender">
+                                    <i class="fa-solid fa-headphones"></i>
+                                </div>
+                                <div class="post-author">
+                                    <span class="category-badge lavender">Lost & Found</span>
+                                    <h5>Lost: Black wireless earbuds</h5>
+                                    <p>
+                                        <i class="fa-solid fa-user-graduate"></i>
+                                        Aarav · CSE
+                                    </p>
+                                </div>
+                                <span class="post-time">5 hours ago</span>
+                            </div>
+
+                            <p class="post-description">
+                                I found a pair of black wireless earbuds near the library canteen today.
+                                If they belong to you, please contact me.
+                            </p>
+
+                            <div class="post-actions">
+                                <button type="button">
+                                    <i class="fa-regular fa-message"></i>
+                                    Contact
+                                </button>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <aside class="right-sidebar">
+                    <section class="widget-card">
+                        <div class="widget-heading">
+                            <h5>Coming up</h5>
+                            <a href="/announcements">View all</a>
+                        </div>
+
+                        <div class="event-card">
+                            <div class="event-date">
+                                <span>NOV</span>
+                                <strong>14</strong>
+                            </div>
+                            <div class="event-info">
+                                <h6>Tech Talk: Building for Impact</h6>
+                                <p>
+                                    <i class="fa-regular fa-clock"></i>
+                                    4:00 PM – 6:00 PM
+                                </p>
+                                <p>
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Lecture Theatre 2
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="event-card">
+                            <div class="event-date">
+                                <span>NOV</span>
+                                <strong>16</strong>
+                            </div>
+                            <div class="event-info">
+                                <h6>Open Mic Night</h6>
+                                <p>
+                                    <i class="fa-regular fa-clock"></i>
+                                    6:30 PM – 9:00 PM
+                                </p>
+                                <p>
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Cultural Centre
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="widget-card">
+                        <div class="widget-heading pulse-heading">
+                            <div class="pulse-icon">
+                                <i class="fa-solid fa-wave-square"></i>
+                            </div>
+                            <div>
+                                <h5>Campus pulse</h5>
+                                <p>What's happening around you</p>
+                            </div>
+                        </div>
+
+                        <a href="/complaints" class="pulse-item">
+                            <div class="pulse-item-icon peach">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                            </div>
+                            <div>
+                                <h4>12</h4>
+                                <p>Open complaints</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+
+                        <a href="/lostfound" class="pulse-item">
+                            <div class="pulse-item-icon lavender">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <div>
+                                <h4>8</h4>
+                                <p>Items reunited</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+
+                        <a href="/announcements" class="pulse-item">
+                            <div class="pulse-item-icon mint">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </div>
+                            <div>
+                                <h4>5</h4>
+                                <p>New notices</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+
+                        <a href="/complaints/new" class="community-cta">
+                            <div class="community-icon">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div>
+                                <h6>Something on your mind?</h6>
+                                <p>Make your voice heard.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    </main>
 </div>

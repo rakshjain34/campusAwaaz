@@ -1,44 +1,29 @@
-<nav class="navbar navbar-expand-md bg-white border-bottom sticky-top">
-    <div class="container-fluid">
-
-        <a class="navbar-brand" href="/campusAwaaz">
-            <i class="fa-solid fa-graduation-cap"></i>
-            CampusAwaaz
+<nav class="navbar campus-navbar">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand campus-brand" href="/">
+            Campus<span>Awaaz</span>
         </a>
 
-        <button class="navbar-toggler" type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation">
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            <% if (typeof currUser !== "undefined" && currUser) { %>
+                <a href="/notifications" class="notification-link" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                </a>
 
-            <span class="navbar-toggler-icon"></span>
-        </button>
+                <a href="/user/profile" class="navbar-profile-link">
+                    <div class="navbar-avatar">
+                        <i class="fa-regular fa-user"></i>
+                    </div>
+                    <span class="navbar-user-name"><%= currUser.name || currUser.firstName || "Student" %></span>
+                </a>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-
-            <div class="navbar-nav ms-auto">
-
-                <% if (!currUser) { %>
-
-                    <a class="nav-link" href="/user/signup">Sign Up</a>
-                    <a class="nav-link" href="/user/login">Login</a>
-
-                <% } else { %>
-
-                    <span class="nav-link">
-                        Hello, <%= currUser.name %>!
-                    </span>
-
-                    <form action="/user/logout" method="POST" class="d-inline">
-                        <button class="nav-link" type="submit">Logout</button>
-                    </form>
-
-                <% } %>
-
-            </div>
-
+                <form action="/user/logout" method="POST" class="m-0">
+                    <button type="submit" class="btn btn-sm logout-btn">Logout</button>
+                </form>
+            <% } else { %>
+                <a href="/user/login" class="btn btn-outline-success btn-sm">Login</a>
+                <a href="/user/signup" class="btn btn-success btn-sm">Sign Up</a>
+            <% } %>
         </div>
     </div>
 </nav>

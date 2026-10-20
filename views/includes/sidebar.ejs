@@ -1,0 +1,51 @@
+<aside class="sidebar">
+        <div class="sidebar-menu">
+            <a href="/" class="sidebar-link active">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="/announcements" class="sidebar-link">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>Announcements</span>
+            </a>
+            <a href="/complaints" class="sidebar-link">
+                <i class="fa-regular fa-clipboard"></i>
+                <span>Complaints</span>
+            </a>
+            <a href="/lostfound" class="sidebar-link">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Lost & Found</span>
+            </a>
+
+            <a href="/timetable" class="sidebar-link">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>Timetables</span>
+            </a>
+        </div>
+        <div class="sidebar-bottom">
+             <% if (typeof currUser !== "undefined" && currUser) { %>
+
+        <a href="/user/profile" class="sidebar-profile">
+
+            <i class="fa-regular fa-circle-user profile-icon"></i>
+
+            <span class="sidebar-profile-name">
+
+                <%= currUser.name || currUser.firstName || "Rakshita" %>
+
+            </span>
+
+        </a>
+
+    <% } else { %>
+                <div class="auth-buttons">
+                    <a href="/user/login" class="btn btn-outline-success w-100 mb-2">
+                        Login
+                    </a>
+                    <a href="/user/signup" class="btn btn-success w-100">
+                        Sign Up
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </aside>
