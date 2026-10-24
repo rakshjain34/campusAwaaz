@@ -20,6 +20,7 @@ const passport = require("passport");
 const LocalStartegy = require("passport-local");
 const User = require("./models/user.js");
 const users = require("./routes/user.js");
+const complaints = require("./routes/complaint.js");
 
 const Announcement = require("./models/announcement.js");
 const announcements = require("./routes/announcement.js");
@@ -49,9 +50,11 @@ app.use(methodOverride("_method"));
 app.use(session(sessionOptions));
 app.use(flash());
 
+
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStartegy(User.authenticate()));
+
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
@@ -66,6 +69,8 @@ app.use((req,res,next) =>{
 
 //announcements
 app.use("/announcements", announcements);
+//complaints
+app.use("/complaints", complaints);
 
 // Database Connection
 main()

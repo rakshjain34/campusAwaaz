@@ -1,0 +1,118 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="container complaints-page complaint-detail-page">
+    <a class="complaints-back" href="/complaints">← Back to complaints</a>
+
+    <article class="complaint-panel complaint-detail">
+        <div class="complaint-tags">
+            <span class="complaint-tag lavender"><%= complaint.category %></span>
+            <span class="complaint-tag blue"><%= complaint.subcategory %></span>
+            <span class="complaint-tag mint"><%= complaint.status %></span>
+            <span class="complaint-tag urgency-<%= complaint.urgency.toLowerCase() %>">
+                <%= complaint.urgency %> urgency
+            </span>
+            <span class="complaint-tag peach"><%= complaint.visibility %></span>
+        </div>
+
+        <h1><%= complaint.title %></h1>
+        <p class="complaint-description"><%= complaint.description %></p>
+
+        <div class="complaint-detail-meta">
+            <span>Submitted by <strong><%= complaint.createdBy?.name || "Student" %></strong></span>
+            <span>
+                <%= new Date(complaint.createdAt).toLocaleString("en-IN", {
+                    dateStyle: "medium",
+                    timeStyle: "short"
+                }) %>
+            </span>
+        </div>
+
+        <% if (complaint.visibility === "Public" && currUser.accountType === "Student") { %>
+            <form method="POST" action="/complaints/<%= complaint._id %>/upvote">
+                <button class="upvote-button" type="submit">
+                    ＋ Support this issue · <%= complaint.upvotes.length %>
+                </button>
+            </form>
+        <% } else if (complaint.visibility === "Public") { %>
+            <p class="upvote-count">＋ <%= complaint.upvotes.length %> student supports</p>
+        <% } %>
+    </article>
+
+    <% if (currUser.accountType === "Staff") { %>
+        <section class="complaint-panel staff-tools">
+            <h2>Staff tools</h2>
+
+            <form
+                method="POST"
+                action="/complaints/<%= complaint._id %>/status"
+                class="staff-status-form"
+            >
+                <label>
+                    Lifecycle status
+                    <select name="status">
+                        <% ["Unseen", "Seen", "In Process", "Done"].forEach(status => { %>
+                            <option value="<%= status %>" <%= complaint.status === status ? "selected" : "" %>>
+                                <%= status %>
+                            </option>
+                        <% }) %>
+                    </select>
+                </label>
+                <button class="complaint-button" type="submit">Update status</button>
+            </form>
+
+            <form
+                method="POST"
+                action="/complaints/<%= complaint._id %>/updates"
+                class="staff-update-form"
+            >
+                <label>
+                    Post an update
+                    <textarea
+                        name="text"
+                        maxlength="1000"
+                        rows="3"
+                        required
+                        placeholder="For example: Repair scheduled for Tuesday at 10 AM"
+                    ></textarea>
+                </label>
+                <button class="complaint-button" type="submit">Post update</button>
+            </form>
+        </section>
+    <% } %>
+
+    <section class="complaint-panel updates-panel">
+        <h2>Updates</h2>
+
+        <% if (!complaint.updates.length) { %>
+            <p class="complaint-muted">There are no staff updates yet.</p>
+        <% } else { %>
+            <ol class="updates-list">
+                <% complaint.updates
+                    .slice()
+                    .sort((a, b) => a.createdAt - b.createdAt)
+                    .forEach(update => { %>
+                        <li>
+                            <p><%= update.text %></p>
+                            <span>
+                                <%= update.postedBy?.name || "Staff" %>
+                                ·
+                                <%= new Date(update.createdAt).toLocaleString("en-IN", {
+                                    dateStyle: "medium",
+                                    timeStyle: "short"
+                                }) %>
+                            </span>
+                        </li>
+                <% }) %>
+            </ol>
+        <% } %>
+    </section>
+
+    <% if (
+        complaint.createdBy?._id?.toString() === currUser._id.toString() ||
+        currUser.accountType === "Staff"
+    ) { %>
+        <a class="complaint-delete-link" href="/complaints/<%= complaint._id %>/edit">
+            Delete this complaint
+        </a>
+    <% } %>
+</div>

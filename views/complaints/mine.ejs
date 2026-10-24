@@ -1,0 +1,63 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="container complaints-page">
+    <a class="complaints-back" href="/complaints">← All complaints</a>
+
+    <header class="complaints-header">
+        <div>
+            <span class="complaints-eyebrow">YOUR SUBMISSIONS</span>
+            <h1>My complaints</h1>
+            <p>Check the status and updates for complaints you submitted.</p>
+        </div>
+
+        <a class="complaint-button" href="/complaints/new">＋ Raise a complaint</a>
+    </header>
+
+    <% if (!complaints.length) { %>
+        <div class="complaint-panel complaint-empty">
+            <h3>You haven’t submitted a complaint yet</h3>
+            <a href="/complaints/new" class="complaint-button">Raise a complaint</a>
+        </div>
+    <% } else { %>
+        <div class="complaint-list">
+            <% complaints.forEach(item => { %>
+                <article class="complaint-panel complaint-card">
+                    <div class="complaint-card-top">
+                        <div class="complaint-tags">
+                            <span class="complaint-tag lavender"><%= item.category %></span>
+                            <span class="complaint-tag blue"><%= item.subcategory %></span>
+                            <span class="complaint-tag mint"><%= item.status %></span>
+                            <span class="complaint-tag peach"><%= item.visibility %></span>
+                        </div>
+
+                        <span class="complaint-date">
+                            <%= new Date(item.createdAt).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric"
+                            }) %>
+                        </span>
+                    </div>
+
+                    <h3>
+                        <a href="/complaints/<%= item._id %>"><%= item.title %></a>
+                    </h3>
+
+                    <p class="complaint-excerpt"><%= item.description %></p>
+
+                    <div class="complaint-card-bottom">
+                        <span>
+                            <%= item.updates.length %>
+                            staff update<%= item.updates.length === 1 ? "" : "s" %>
+                        </span>
+
+                        <div class="complaint-card-actions">
+                            <a href="/complaints/<%= item._id %>">View status →</a>
+                            <a href="/complaints/<%= item._id %>/edit">Delete</a>
+                        </div>
+                    </div>
+                </article>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
