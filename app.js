@@ -22,6 +22,8 @@ const User = require("./models/user.js");
 const users = require("./routes/user.js");
 const complaints = require("./routes/complaint.js");
 
+const lostfounds = require("./routes/lostfound.js");
+
 const Announcement = require("./models/announcement.js");
 const announcements = require("./routes/announcement.js");
 
@@ -71,6 +73,8 @@ app.use((req,res,next) =>{
 app.use("/announcements", announcements);
 //complaints
 app.use("/complaints", complaints);
+//lostfound
+app.use("/lostfound", lostfounds);
 
 // Database Connection
 main()

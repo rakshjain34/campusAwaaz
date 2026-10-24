@@ -1,0 +1,81 @@
+
+<% layout("/layouts/boilerplate") -%>
+
+<div class="container py-4">
+    <a href="/lostfound" class="text-decoration-none">← Back to Lost & Found</a>
+
+    <div class="row g-4 mt-2">
+        <div class="col-md-5">
+            <% if (item.image) { %>
+                <img src="<%= item.image %>" alt="Item image" class="img-fluid rounded shadow-sm w-100" style="max-height:450px; object-fit:contain;">
+            <% } else { %>
+                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height:250px;">
+                    <span class="text-muted">No image provided</span>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="col-md-7">
+            <div class="d-flex gap-2 mb-3">
+                <span class="badge <%= item.itemType === 'Lost' ? 'bg-danger' : 'bg-success' %>"><%= item.itemType %></span>
+                <span class="badge bg-secondary"><%= item.status %></span>
+            </div>
+
+            <h1><%= item.name %></h1>
+            <p class="text-muted"><%= item.category %> · <%= item.color %></p>
+            <p><%= item.description %></p>
+
+            <% if (item.specifications) { %>
+                <p><strong>Identifying details:</strong> <%= item.specifications %></p>
+            <% } %>
+
+            <p><strong>Location:</strong> <%= item.location %></p>
+            <p><strong>Date:</strong> <%= new Date(item.date).toLocaleDateString("en-IN") %></p>
+            <p><strong>Reported by:</strong> <%= item.createdBy?.name || "Campus user" %></p>
+
+            <% if (item.createdBy?.branch) { %>
+                <p><strong>Branch:</strong> <%= item.createdBy.branch %></p>
+            <% } %>
+
+            <% if (currUser && item.createdBy && item.createdBy._id.toString() === currUser._id.toString()) { %>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a href="/lostfound/<%= item._id %>/edit" class="btn btn-outline-primary">Edit</a>
+
+                    <% if (item.status === "Active") { %>
+                        <form action="/lostfound/<%= item._id %>/resolve" method="POST">
+                            <button class="btn btn-success" type="submit">Mark Resolved</button>
+                        </form>
+                    <% } %>
+
+                    <form action="/lostfound/<%= item._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this report?')">
+                        <button class="btn btn-danger" type="submit">Delete</button>
+                    </form>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <% if (matches.length) { %>
+        <hr class="my-5">
+        <h2>Possible Matching Items</h2>
+        <p class="text-muted">These reports have the opposite type and the same category.</p>
+
+        <div class="row g-3">
+            <% matches.forEach(match => { %>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <% if (match.image) { %>
+                            <img src="<%= match.image %>" class="card-img-top" alt="Matching item" style="height:160px; object-fit:cover;">
+                        <% } %>
+                        <div class="card-body">
+                            <span class="badge <%= match.itemType === 'Lost' ? 'bg-danger' : 'bg-success' %>"><%= match.itemType %></span>
+                            <h5 class="mt-2"><%= match.name %></h5>
+                            <p class="text-muted"><%= match.category %> · <%= match.color %></p>
+                            <a href="/lostfound/<%= match._id %>" class="btn btn-outline-primary">View Report</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
