@@ -1,5 +1,4 @@
 const User = require("../models/user.js");
-
 module.exports.renderSignup = (req, res) => {
     res.render("users/signup.ejs");
 };
@@ -19,10 +18,7 @@ module.exports.signup = async (req, res, next) => {
             hostel,
             clubs
         } = req.body;
-
-        // let { username, email, password } = req.body;
-        // const newUser = new User({ email, username });
-
+        email = email.trim().toLowerCase();
         const newUser = new User({
             name,
             email,
@@ -34,7 +30,9 @@ module.exports.signup = async (req, res, next) => {
             branch,
             hostel,
             clubs: clubs || [],
-            studentRole: "Student"
+            studentRole: "Student",
+            roleRequest: null,
+            verified: false
         });
         const regUser = await User.register(newUser, password);
         req.login(regUser, (err) => {
@@ -49,7 +47,22 @@ module.exports.signup = async (req, res, next) => {
         res.redirect("/user/signup");
     }
 };
-
+module.exports.renderLogin = (req, res) => {
+    res.render("users/login.ejs");
+};
+module.exports.login = async (req, res) => {
+    req.flash("success", "Successfully logged in!");
+    res.redirect(res.locals.redirectUrl || "/campusAwaaz");
+};
+module.exports.logout = (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        req.flash("success", "Logged out successfully!");
+        res.redirect("/campusAwaaz");
+    });
+};
 module.exports.staffSignup = async (req, res, next) => {
     try {
         let {
@@ -60,10 +73,7 @@ module.exports.staffSignup = async (req, res, next) => {
             designation,
             hostel
         } = req.body;
-
-        // let { username, email, password } = req.body;
-        // const newUser = new User({ email, username });
-
+        email = email.trim().toLowerCase();
         const newStaff = new User({
             name,
             email,
@@ -71,7 +81,7 @@ module.exports.staffSignup = async (req, res, next) => {
             accountType: "Staff",
             staffId,
             designation,
-            hostel,
+            hostel
         });
         const regStaff = await User.register(newStaff, password);
         req.login(regStaff, (err) => {
@@ -85,22 +95,4 @@ module.exports.staffSignup = async (req, res, next) => {
         req.flash("error", e.message);
         res.redirect("/user/signup");
     }
-};
-module.exports.renderLogin = (req, res) => {
-    res.render("users/login.ejs");
-};
-
-module.exports.login = async (req, res) => {
-    req.flash("success", "Successfully logged in!");
-    res.redirect(res.locals.redirectUrl || "/campusAwaaz");
-};
-
-module.exports.logout = (req, res, next) => {
-    req.logout((err) => {
-        if (err) {
-            return next(err);
-        }
-        req.flash("success", "Logged out successfully!");
-        res.redirect("/campusAwaaz");
-    });
 };

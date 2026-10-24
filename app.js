@@ -21,14 +21,12 @@ const LocalStartegy = require("passport-local");
 const User = require("./models/user.js");
 const users = require("./routes/user.js");
 
-// const listings = require("./routes/listing.js");
-// const reviews = require("./routes/review.js");
-// const users = require("./routes/user.js");
-// const chats = require("./routes/chat.js");
+const Announcement = require("./models/announcement.js");
+const announcements = require("./routes/announcement.js");
 
 const port = 8080;
 const sessionOptions = {
-    secret: "code",
+    secret: process.env.SESSION_SECRET || "code",
     resave: false,
     saveUninitialized : true,
     cookie : {
@@ -58,13 +56,16 @@ passport.use(new LocalStartegy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-
+// before domains
 app.use((req,res,next) =>{
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currUser = req.user;
     next();
 })
+
+//announcements
+app.use("/announcements", announcements);
 
 // Database Connection
 main()
@@ -83,6 +84,9 @@ app.get("/", (req, res) => {
 app.get("/campusAwaaz", (req, res) => {
     res.render("pages/home.ejs");
 });
+
+
+
 // User Routes
 app.use("/user", users);
 
@@ -91,6 +95,13 @@ app.use((req, res, next) => {
 });
 
 // Error Handler
+app.use((err, req, res, next) => {
+    console.error("ERROR:", err.stack || err);
+    if (res.headersSent) {
+        return next(err);
+    }
+    res.status(err.statusCode || 500).send(err.message || "Something went wrong!");
+});
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = "Something went wrong!" } = err;
     res.status(statusCode).send(message);

@@ -50,7 +50,8 @@ const userSchema = new Schema({
     },
     branch: {
         type: String,
-        enum : ["CSE",
+        enum : [
+            "CSE",
             "CSE (AI & DS)",
             "MNC",
             "ECE",
@@ -101,7 +102,12 @@ const userSchema = new Schema({
     studentRole: {
         type: String,
         enum: ["Student", "CR", "GenSec"],
-        default: "Student"
+        default: function () {
+            return this.accountType === "Student" ? "Student" : undefined;
+        },
+        required: function () {
+            return this.accountType === "Student";
+        }
     },
     roleRequest: {
         type: String,

@@ -1,0 +1,142 @@
+<% layout("/layouts/boilerplate") -%>
+<%
+    const targetTypes = announcement.targetTypes || [];
+    const staffAudiences = Array.isArray(announcement.staffAudience) ? announcement.staffAudience : announcement.staffAudience ? [announcement.staffAudience] : [];
+    const branches = announcement.branches || [];
+    const years = announcement.years || [];
+    const sections = announcement.sections || [];
+    const isEveryone = targetTypes.includes("Everyone");
+    const isStudent = targetTypes.includes("Student");
+    const isStaff = targetTypes.includes("Staff");
+%>
+<div class="announcement-form-page">
+    <div class="announcement-form-card">
+        <div class="announcement-form-header">
+            <div class="announcement-icon">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </div>
+            <h1>Edit Announcement</h1>
+            <p>Update the details and keep your campus community informed.</p>
+        </div>
+        <form action="/announcements/<%= announcement._id %>?_method=PUT" method="POST" id="announcementForm">
+            <div class="mb-4">
+                <label for="title" class="form-label">Announcement Title</label>
+                <input type="text" id="title" name="announcement[title]" class="form-control" value="<%= announcement.title %>" maxlength="150" placeholder="Enter a clear, descriptive title" required>
+            </div>
+            <div class="mb-4">
+                <label for="category" class="form-label">Category</label>
+                <select id="category" name="announcement[category]" class="form-select" required>
+                    <option value="Academic" <%= announcement.category === "Academic" ? "selected" : "" %>>Academic</option>
+                    <option value="Events" <%= announcement.category === "Events" ? "selected" : "" %>>Events</option>
+                    <option value="Clubs" <%= announcement.category === "Clubs" ? "selected" : "" %>>Clubs</option>
+                    <option value="Hostel" <%= announcement.category === "Hostel" ? "selected" : "" %>>Hostel</option>
+                    <option value="Placement" <%= announcement.category === "Placement" ? "selected" : "" %>>Placement</option>
+                    <option value="General" <%= announcement.category === "General" ? "selected" : "" %>>General</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="description" class="form-label">Announcement Details</label>
+                <textarea id="description" name="announcement[description]" class="form-control" rows="7" maxlength="5000" placeholder="Write all the important details here..." required><%= announcement.description %></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Who is this announcement for?</label>
+                <p class="text-muted small">Select one or more audiences.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input audience-checkbox" type="checkbox" id="audienceEveryone" name="announcement[targetTypes]" value="Everyone" <%= isEveryone ? "checked" : "" %>>
+                        <label class="form-check-label" for="audienceEveryone">Everyone</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input audience-checkbox" type="checkbox" id="audienceStudents" name="announcement[targetTypes]" value="Student" <%= isStudent ? "checked" : "" %>>
+                        <label class="form-check-label" for="audienceStudents">Students</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input audience-checkbox" type="checkbox" id="audienceStaff" name="announcement[targetTypes]" value="Staff" <%= isStaff ? "checked" : "" %>>
+                        <label class="form-check-label" for="audienceStaff">Staff</label>
+                    </div>
+                </div>
+                <div id="audienceError" class="text-danger small mt-2" hidden>Select at least one audience.</div>
+            </div>
+            <div class="mb-4" id="staffAudienceGroup" style="display: none;">
+                <label class="form-label">Staff Audience</label>
+                <p class="text-muted small">Select one or more staff groups.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input staff-audience-checkbox" type="checkbox" id="staffAll" name="announcement[staffAudience]" value="All" <%= staffAudiences.includes("All") ? "checked" : "" %>>
+                        <label class="form-check-label" for="staffAll">All Staff</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input staff-audience-checkbox" type="checkbox" id="staffWardens" name="announcement[staffAudience]" value="Wardens" <%= staffAudiences.includes("Wardens") ? "checked" : "" %>>
+                        <label class="form-check-label" for="staffWardens">Wardens Only</label>
+                    </div>
+                </div>
+            </div>
+            <div id="studentAudienceGroup" style="display: none;">
+                <div class="mb-4">
+                    <label class="form-label">Branches</label>
+                    <p class="text-muted small">Choose one or more branches, or select all branches.</p>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input select-all-checkbox" type="checkbox" id="allBranches" data-group="branch-checkbox" <%= branches.length === 0 && isStudent ? "checked" : "" %>>
+                        <label class="form-check-label" for="allBranches">All Branches</label>
+                    </div>
+                    <div class="d-flex flex-wrap gap-3">
+                        <% ["CSE", "ECE", "EEE", "ME", "CE", "Chemical", "Biotechnology", "Metallurgical and Materials Engineering"].forEach(branch => { %>
+                            <div class="form-check">
+                                <input class="form-check-input branch-checkbox" type="checkbox" id="branch<%= branch %>" name="announcement[branches]" value="<%= branch %>" <%= branches.includes(branch) ? "checked" : "" %>>
+                                <label class="form-check-label" for="branch<%= branch %>"><%= branch %></label>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Years</label>
+                    <p class="text-muted small">Choose one or more years, or select all years.</p>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input select-all-checkbox" type="checkbox" id="allYears" data-group="year-checkbox" <%= years.length === 0 && isStudent ? "checked" : "" %>>
+                        <label class="form-check-label" for="allYears">All Years</label>
+                    </div>
+                    <div class="d-flex flex-wrap gap-3">
+                        <% [{value: 1, label: "1st Year"}, {value: 2, label: "2nd Year"}, {value: 3, label: "3rd Year"}, {value: 4, label: "4th Year"}].forEach(year => { %>
+                            <div class="form-check">
+                                <input class="form-check-input year-checkbox" type="checkbox" id="year<%= year.value %>" name="announcement[years]" value="<%= year.value %>" <%= years.includes(year.value) ? "checked" : "" %>>
+                                <label class="form-check-label" for="year<%= year.value %>"><%= year.label %></label>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Sections</label>
+                    <p class="text-muted small">Choose one or more sections, or select all sections.</p>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input select-all-checkbox" type="checkbox" id="allSections" data-group="section-checkbox" <%= sections.length === 0 && isStudent ? "checked" : "" %>>
+                        <label class="form-check-label" for="allSections">All Sections</label>
+                    </div>
+                    <div class="d-flex flex-wrap gap-3">
+                        <% ["A", "B", "C", "D"].forEach(section => { %>
+                            <div class="form-check">
+                                <input class="form-check-input section-checkbox" type="checkbox" id="section<%= section %>" name="announcement[sections]" value="<%= section %>" <%= sections.includes(section) ? "checked" : "" %>>
+                                <label class="form-check-label" for="section<%= section %>">Section <%= section %></label>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <div id="studentAudienceError" class="text-danger small mb-3" hidden>Select at least one branch, year, and section, or select all for each category.</div>
+            </div>
+            <div class="mb-4">
+                <label for="priority" class="form-label">Priority</label>
+                <select id="priority" name="announcement[priority]" class="form-select" required>
+                    <option value="Normal" <%= announcement.priority === "Normal" ? "selected" : "" %>>Normal</option>
+                    <option value="Important" <%= announcement.priority === "Important" ? "selected" : "" %>>Important</option>
+                    <option value="Urgent" <%= announcement.priority === "Urgent" ? "selected" : "" %>>Urgent</option>
+                </select>
+            </div>
+            <div class="announcement-form-actions">
+                <a href="/announcements/<%= announcement._id %>" class="btn btn-light">Cancel</a>
+                <button type="submit" class="btn btn-announcement-submit">
+                    <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="/js/announcements.js"></script>
