@@ -15,7 +15,7 @@ const userSchema = new Schema({
     },
     accountType: {
         type: String,
-        enum: ["Student", "Staff"],
+        enum: ["Student", "Staff", "Shopkeeper"],
         required: true,
         default: "Student"
     },

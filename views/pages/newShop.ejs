@@ -1,0 +1,37 @@
+
+<% layout("/layouts/boilerplate") -%>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Add Your Shop Details</h2>
+
+    <form action="/services" method="POST">
+        <div class="mb-3">
+            <label for="shopName" class="form-label">Shop Name</label>
+            <input type="text" id="shopName" name="shopName"
+                   class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="location" class="form-label">Shop Location</label>
+            <input type="text" id="location" name="location"
+                   class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="timings" class="form-label">Usual Timings</label>
+            <input type="text" id="timings" name="timings"
+                   class="form-control"
+                   placeholder="e.g. 9 AM - 8 PM" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" name="description"
+                      class="form-control" rows="4" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Add Shop
+        </button>
+    </form>
+</div>

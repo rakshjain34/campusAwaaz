@@ -6,6 +6,36 @@ module.exports.renderSignup = (req, res) => {
 module.exports.renderStaffSignup = (req, res) => {
     res.render("users/staffSignup.ejs");
 };
+module.exports.renderShopkeeperSignup = (req, res) => {
+    res.render("users/shopkeeperSignup.ejs");
+};
+
+module.exports.shopkeeperSignup = async (req, res, next) => {
+    try {
+        let { name, email, password } = req.body;
+
+        const newShopkeeper = new User({
+            name,
+            email,
+            username: email,
+            accountType: "Shopkeeper"
+        });
+
+        const regShopkeeper = await User.register(newShopkeeper, password);
+
+        req.login(regShopkeeper, (err) => {
+            if (err) {
+                return next(err);
+            }
+
+            req.flash("success", "Shopkeeper account registered successfully!");
+            res.redirect("/campusAwaaz");
+        });
+    } catch (e) {
+        req.flash("error", e.message);
+        res.redirect("/user/signup/shopkeeper");
+    }
+};
 module.exports.signup = async (req, res, next) => {
     try {
         let {

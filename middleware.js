@@ -10,6 +10,14 @@ module.exports.isLoggedIn = (req,res, next)=>{
     }
     next();   
 }
+module.exports.isShopkeeper = (req, res, next) => {
+    if (req.user && req.user.accountType === "Shopkeeper") {
+        return next();
+    }
+
+    req.flash("error", "Only shopkeepers can perform this action.");
+    return res.redirect("/services");
+};
 
 module.exports.saveRedirectUrl = (req,res,next)=>{
     if(req.session.redirectUrl){

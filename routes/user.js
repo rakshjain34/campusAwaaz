@@ -22,5 +22,10 @@ router
     .route("/signup/staff")
     .get(userController.renderStaffSignup)
     .post(wrapAsync(userController.staffSignup))
+    
+router
+    .route("/signup/shopkeeper")
+    .get(userController.renderShopkeeperSignup)
+    .post(wrapAsync(userController.shopkeeperSignup));
 router.post("/logout", userController.logout);
 module.exports = router;

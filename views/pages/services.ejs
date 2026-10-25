@@ -1,0 +1,78 @@
+
+<% layout("/layouts/boilerplate") -%>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Campus Shops</h2>
+
+    <% if (currentUser && currentUser.accountType === "Shopkeeper") { %>
+        <a href="/services/new" class="btn btn-primary mb-4">
+            Add Shop Details
+        </a>
+    <% } %>
+
+    <% if (shops.length === 0) { %>
+        <p>No shops have been added yet.</p>
+    <% } %>
+
+    <div class="row">
+        <% for (let shop of shops) { %>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= shop.shopName %></h5>
+
+                        <p>
+                            <strong>Location:</strong>
+                            <%= shop.location %>
+                        </p>
+
+                        <p>
+                            <strong>Usual Timings:</strong>
+                            <%= shop.timings %>
+                        </p>
+
+                        <p>
+                            <strong>Description:</strong>
+                            <%= shop.description %>
+                        </p>
+
+                        <p>
+                            <strong>Status:</strong>
+                            <% if (shop.isOpen) { %>
+                                <span class="text-success">Open</span>
+                            <% } else { %>
+                                <span class="text-danger">Closed</span>
+                            <% } %>
+                        </p>
+
+                        <% if (currentUser &&
+                              currentUser.accountType === "Shopkeeper" &&
+                              shop.shopkeeper.equals(currentUser._id)) { %>
+
+                            <form action="/services/<%= shop._id %>/status"
+                                  method="POST">
+
+                                <select name="isOpen" class="form-select mb-2">
+                                    <option value="true"
+                                        <%= shop.isOpen ? "selected" : "" %>>
+                                        Open
+                                    </option>
+
+                                    <option value="false"
+                                        <%= !shop.isOpen ? "selected" : "" %>>
+                                        Closed
+                                    </option>
+                                </select>
+
+                                <button type="submit" class="btn btn-success">
+                                    Update Status
+                                </button>
+                            </form>
+
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>

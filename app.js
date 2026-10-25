@@ -53,6 +53,12 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    next();
+});
+
 passport.use(new LocalStartegy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
@@ -85,6 +91,10 @@ app.get("/campusAwaaz", (req, res) => {
 });
 // User Routes
 app.use("/user", users);
+
+// Services Routes
+const services = require("./routes/services.js");
+app.use("/services", services);
 
 app.use((req, res, next) => {
     next(new ExpressError(404, "Page Not Found"));
