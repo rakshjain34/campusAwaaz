@@ -1,0 +1,86 @@
+<% layout("/layouts/boilerplate") -%>
+<div class="container announcement-index-page">
+    <div class="announcement-index-header">
+        <div>
+            <span class="announcement-eyebrow"><i class="fa-solid fa-leaf me-2"></i>CAMPUSAWAAZ</span>
+            <h1>Announcements</h1>
+            <p>Stay updated with everything happening around your campus.</p>
+        </div>
+        <% if (currUser && (currUser.accountType === "Staff" || (currUser.accountType === "Student" && ["CR", "GenSec"].includes(currUser.studentRole)))) { %>
+            <a href="/announcements/new" class="btn btn-announcement-submit">
+                <i class="fa-solid fa-plus me-2"></i>New Announcement
+            </a>
+        <% } %>
+    </div>
+    <div class="announcement-index-banner">
+        <div class="announcement-banner-icon">
+            <i class="fa-solid fa-bullhorn"></i>
+        </div>
+        <div>
+            <h5>What's happening on campus?</h5>
+            <p>Important notices, upcoming events, academic updates, and more—all in one place.</p>
+        </div>
+    </div>
+    <% if (announcements.length === 0) { %>
+        <div class="announcement-empty-state">
+            <div class="announcement-empty-icon">
+                <i class="fa-regular fa-bell-slash"></i>
+            </div>
+            <h4>No announcements yet</h4>
+            <p>Check back later for updates from your campus community.</p>
+        </div>
+    <% } else { %>
+        <div class="announcement-list">
+            <% announcements.forEach(announcement => {
+                const targetTypes = announcement.targetTypes || [];
+                const staffAudiences = Array.isArray(announcement.staffAudience) ? announcement.staffAudience : announcement.staffAudience ? [announcement.staffAudience] : [];
+                const branches = announcement.branches || [];
+                const years = announcement.years || [];
+                const sections = announcement.sections || [];
+                const audienceLabels = [];
+
+                if (targetTypes.includes("Everyone")) {
+                    audienceLabels.push("Everyone");
+                } else {
+                    if (targetTypes.includes("Student")) {
+                        const branchLabel = branches.length ? branches.join(", ") : "All Branches";
+                        const yearLabel = years.length ? years.map(year => `${year}${year === 1 ? "st" : year === 2 ? "nd" : year === 3 ? "rd" : "th"} Year`).join(", ") : "All Years";
+                        const sectionLabel = sections.length ? sections.map(section => `Section ${section}`).join(", ") : "All Sections";
+                        audienceLabels.push(`Students: ${branchLabel} | ${yearLabel} | ${sectionLabel}`);
+                    }
+
+                    if (targetTypes.includes("Staff")) {
+                        const staffLabel = staffAudiences.includes("All") || !staffAudiences.length ? "All Staff" : staffAudiences.join(", ");
+                        audienceLabels.push(`Staff: ${staffLabel}`);
+                    }
+                }
+            %>
+                <div class="announcement-list-card">
+                    <div class="announcement-list-card-top">
+                        <span class="announcement-category-badge"><i class="fa-solid fa-tag me-2"></i><%= announcement.category %></span>
+                        <span class="announcement-date"><i class="fa-regular fa-calendar me-2"></i><%= new Date(announcement.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) %></span>
+                    </div>
+                    <% if (announcement.isPinned) { %>
+                        <span class="announcement-category-badge"><i class="fa-solid fa-thumbtack me-2"></i>Pinned</span>
+                    <% } %>
+                    <h4><%= announcement.title %></h4>
+                    <p class="announcement-list-excerpt"><%= announcement.description.length > 180 ? announcement.description.substring(0, 180) + "..." : announcement.description %></p>
+                    <div class="announcement-meta mb-3">
+                        <span class="announcement-category-badge"><i class="fa-solid fa-users me-2"></i><%= audienceLabels.join(" • ") || "Audience not specified" %></span>
+                        <span class="announcement-category-badge"><i class="fa-solid fa-flag me-2"></i><%= announcement.priority %></span>
+                    </div>
+                    <div class="announcement-list-card-bottom">
+                        <div class="announcement-list-author">
+                            <span class="announcement-list-author-icon"><i class="fa-solid fa-user"></i></span>
+                            <div>
+                                <span class="announcement-list-author-name"><%= announcement.postedBy ? announcement.postedBy.name : "Unknown Author" %></span>
+                                <span class="announcement-list-author-role"><%= announcement.postedBy ? (announcement.postedBy.accountType === "Staff" ? (announcement.postedBy.designation || "Staff") : (announcement.postedBy.studentRole || "Student")) : "CampusAwaaz Member" %></span>
+                            </div>
+                        </div>
+                        <a href="/announcements/<%= announcement._id %>" class="announcement-read-more">Read More <i class="fa-solid fa-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>

@@ -1,0 +1,237 @@
+:root {
+    --campus-bg: #f8f9fc;
+    --campus-primary: #648c80;
+    --campus-primary-light: #e7f0ec;
+    --campus-text: #34433f;
+    --campus-muted: #87938f;
+    --campus-border: #e9eeeb;
+    --campus-white: #ffffff;
+}
+
+body.campus-layout {
+    margin: 0;
+    background: var(--campus-bg);
+    color: var(--campus-text);
+}
+
+.campus-navbar {
+    height: 76px;
+    background: var(--campus-white);
+    border-bottom: 1px solid var(--campus-border);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+.campus-brand {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: var(--campus-text);
+    letter-spacing: -0.5px;
+    text-decoration: none;
+}
+
+.campus-brand span {
+    color: var(--campus-primary);
+}
+
+.notification-link {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    color: var(--campus-text);
+    background: var(--campus-bg);
+    text-decoration: none;
+}
+
+.notification-link:hover {
+    background: var(--campus-primary-light);
+    color: var(--campus-primary);
+}
+
+.navbar-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--campus-text);
+    text-decoration: none;
+}
+
+.navbar-profile-link:hover {
+    color: var(--campus-primary);
+}
+
+.navbar-avatar,
+.sidebar-avatar {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--campus-primary-light);
+    color: var(--campus-primary);
+    font-weight: 700;
+}
+
+.navbar-user-name {
+    font-weight: 600;
+}
+
+.logout-btn {
+    background: var(--campus-white);
+    border: 1px solid var(--campus-border);
+    color: var(--campus-text);
+    border-radius: 9px;
+}
+
+.logout-btn:hover {
+    background: #fff0ef;
+    border-color: #f1d3d0;
+    color: #b44c46;
+}
+
+.app-shell {
+    display: flex;
+    align-items: stretch;
+    min-height: calc(100vh - 76px);
+}
+
+.campus-sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--campus-white);
+    border-right: 1px solid var(--campus-border);
+    padding: 24px 16px;
+}
+
+.sidebar-menu {
+    flex: 1;
+}
+
+.sidebar-heading {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--campus-muted);
+    letter-spacing: 1px;
+    padding: 0 12px;
+    margin: 0 0 12px;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 12px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    color: var(--campus-text);
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-link i {
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+    background: var(--campus-primary-light);
+    color: var(--campus-primary);
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--campus-border);
+}
+
+.sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    color: var(--campus-text);
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-profile:hover {
+    background: var(--campus-primary-light);
+    color: var(--campus-primary);
+}
+
+.profile-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.sidebar-profile-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.sidebar-profile-name {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.sidebar-profile-info small {
+    color: var(--campus-muted);
+}
+
+.page-content {
+    flex: 1;
+    min-width: 0;
+    padding: 24px;
+}
+
+@media (max-width: 768px) {
+    .campus-sidebar {
+        width: 72px;
+        padding: 20px 10px;
+    }
+
+    .sidebar-link {
+        justify-content: center;
+        padding: 14px 8px;
+    }
+
+    .sidebar-link i {
+        font-size: 1.1rem;
+    }
+
+    .sidebar-link span,
+    .sidebar-profile-info,
+    .auth-buttons,
+    .sidebar-heading {
+        display: none;
+    }
+
+    .sidebar-profile {
+        justify-content: center;
+        padding: 10px 0;
+    }
+
+    .page-content {
+        padding: 16px;
+    }
+
+    .navbar-user-name {
+        display: none;
+    }
+
+    .campus-brand {
+        font-size: 1.25rem;
+    }
+}

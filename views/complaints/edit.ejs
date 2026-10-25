@@ -1,0 +1,34 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="container complaints-page complaint-delete-page">
+    <a class="complaints-back" href="/complaints/<%= complaint._id %>">
+        ← Back to complaint
+    </a>
+
+    <div class="complaint-panel">
+        <span class="complaints-eyebrow">DELETE COMPLAINT</span>
+        <h1>Delete this complaint?</h1>
+
+        <p>
+            This will permanently remove
+            <strong>“<%= complaint.title %>”</strong>
+            and its updates.
+        </p>
+
+        <form
+            action="/complaints/<%= complaint._id %>?_method=DELETE"
+            method="POST"
+        >
+            <button class="complaint-button complaint-button-danger" type="submit">
+                Delete complaint
+            </button>
+
+            <a
+                class="complaint-button complaint-button-light"
+                href="/complaints/<%= complaint._id %>"
+            >
+                Cancel
+            </a>
+        </form>
+    </div>
+</div>

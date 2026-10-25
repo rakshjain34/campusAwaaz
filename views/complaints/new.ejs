@@ -1,0 +1,105 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="container complaints-page complaint-form-page">
+    <a href="/complaints" class="complaints-back">← Back to complaints</a>
+
+    <header class="complaints-header">
+        <div>
+            <span class="complaints-eyebrow">CAMPUSAWAAZ · STUDENT VOICE</span>
+            <h1>Raise a complaint</h1>
+            <p>Tell us what needs attention and the right campus team can follow up.</p>
+        </div>
+    </header>
+
+    <form action="/complaints" method="POST" class="complaint-panel complaint-form">
+        <label>
+            Title
+            <input
+                name="complaint[title]"
+                maxlength="150"
+                required
+                placeholder="Briefly describe the issue"
+            >
+        </label>
+
+        <div class="complaint-form-grid">
+            <label>
+                Category
+                <select name="complaint[category]" id="complaint-category" required>
+                    <option value="">Choose a category</option>
+                    <option value="Hostel">Hostel</option>
+                    <option value="Common Buildings">Common Buildings</option>
+                </select>
+            </label>
+
+            <label>
+                Subcategory
+                <select name="complaint[subcategory]" id="complaint-subcategory" required disabled>
+                    <option value="">Choose a subcategory</option>
+                </select>
+            </label>
+
+            <label>
+                Urgency
+                <select name="complaint[urgency]" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </label>
+
+            <label>
+                Visibility
+                <select name="complaint[visibility]" required>
+                    <option value="Public">Public — other students can see and upvote it</option>
+                    <option value="Private">Private — only you and staff can see it</option>
+                </select>
+            </label>
+        </div>
+
+        <label>
+            Details
+            <textarea
+                name="complaint[description]"
+                rows="6"
+                maxlength="5000"
+                required
+                placeholder="Add useful details, such as the location or when the issue started."
+            ></textarea>
+        </label>
+
+        <button class="complaint-button" type="submit">Submit complaint</button>
+    </form>
+</div>
+
+<script>
+    const subcategoryOptions = {
+        "Hostel": [
+            "Mess",
+            "Lift",
+            "Electricity, lights, fans and appliances",
+            "Washrooms",
+            "Other issues"
+        ],
+        "Common Buildings": [
+            "Lift",
+            "Other issues"
+        ]
+    };
+
+    const categorySelect = document.getElementById("complaint-category");
+    const subcategorySelect = document.getElementById("complaint-subcategory");
+
+    categorySelect.addEventListener("change", () => {
+        subcategorySelect.innerHTML = '<option value="">Choose a subcategory</option>';
+
+        (subcategoryOptions[categorySelect.value] || []).forEach(value => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+            subcategorySelect.appendChild(option);
+        });
+
+        subcategorySelect.disabled = !subcategoryOptions[categorySelect.value];
+    });
+</script>

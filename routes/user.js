@@ -1,10 +1,10 @@
 const express = require("express");
 const wrapAsync = require("../utils/wrapAsync.js");
 const ExpressError = require("../utils/ExpressError.js")
-//const {userSchema} = require("../schema.js");
+// const {userSchema} = require("../schema.js");
 const User = require("../models/user.js");
 const passport = require("passport");
-const { saveRedirectUrl } = require("../middleware.js");
+const { saveRedirectUrl, isLoggedIn} = require("../middleware.js");
 const router = express.Router();
 const userController = require("../controllers/users.js");
 

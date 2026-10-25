@@ -1,0 +1,150 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="container complaints-page">
+    <header class="complaints-header">
+        <div>
+            <span class="complaints-eyebrow">CAMPUSAWAAZ · STUDENT VOICE</span>
+            <h1>Complaints</h1>
+            <p>Report campus issues, follow progress, and support public complaints.</p>
+        </div>
+
+        <div class="complaints-actions">
+            <% if (currUser.accountType === "Student") { %>
+                <a class="complaint-button" href="/complaints/new">＋ Raise a complaint</a>
+                <a class="complaint-button complaint-button-light" href="/complaints/mine">My complaints</a>
+            <% } %>
+        </div>
+    </header>
+
+    <% if (currUser.accountType === "Staff") { %>
+        <form method="GET" action="/complaints" class="complaint-filters complaint-panel">
+            <label>
+                Category
+                <select name="category">
+                    <option value="">All categories</option>
+                    <% ["Hostel", "Common Buildings"].forEach(category => { %>
+                        <option value="<%= category %>" <%= filters.category === category ? "selected" : "" %>>
+                            <%= category %>
+                        </option>
+                    <% }) %>
+                </select>
+            </label>
+
+            <label>
+                Subcategory
+                <select name="subcategory">
+                    <option value="">All subcategories</option>
+                    <% ["Mess", "Lift", "Electricity, lights, fans and appliances", "Washrooms", "Other issues"].forEach(subcategory => { %>
+                        <option value="<%= subcategory %>" <%= filters.subcategory === subcategory ? "selected" : "" %>>
+                            <%= subcategory %>
+                        </option>
+                    <% }) %>
+                </select>
+            </label>
+
+            <label>
+                Urgency
+                <select name="urgency">
+                    <option value="">All urgency</option>
+                    <% ["Low", "Medium", "High"].forEach(urgency => { %>
+                        <option value="<%= urgency %>" <%= filters.urgency === urgency ? "selected" : "" %>>
+                            <%= urgency %>
+                        </option>
+                    <% }) %>
+                </select>
+            </label>
+
+            <button class="complaint-button" type="submit">Filter</button>
+            <a class="complaint-button complaint-button-light" href="/complaints">Clear</a>
+        </form>
+    <% } %>
+
+    <div class="complaints-content-grid">
+        <section>
+            <h2 class="complaints-section-title">
+                <%= currUser.accountType === "Staff" ? "All complaints" : "Public complaints" %>
+            </h2>
+
+            <% if (!complaints.length) { %>
+                <div class="complaint-panel complaint-empty">
+                    <h3>No complaints found</h3>
+                    <p>Try another filter or submit a new complaint.</p>
+                </div>
+            <% } %>
+
+            <div class="complaint-list">
+                <% complaints.forEach(item => { %>
+                    <article class="complaint-panel complaint-card">
+                        <div class="complaint-card-top">
+                            <div class="complaint-tags">
+                                <span class="complaint-tag lavender"><%= item.category %></span>
+                                <span class="complaint-tag blue"><%= item.subcategory %></span>
+                                <span class="complaint-tag urgency-<%= item.urgency.toLowerCase() %>">
+                                    <%= item.urgency %> urgency
+                                </span>
+                                <span class="complaint-tag mint"><%= item.status %></span>
+                            </div>
+
+                            <span class="complaint-date">
+                                <%= new Date(item.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) %>
+                            </span>
+                        </div>
+
+                        <h3>
+                            <a href="/complaints/<%= item._id %>"><%= item.title %></a>
+                        </h3>
+
+                        <p class="complaint-excerpt">
+                            <%= item.description.length > 190
+                                ? item.description.slice(0, 190) + "…"
+                                : item.description %>
+                        </p>
+
+                        <div class="complaint-card-bottom">
+                            <span>
+                                <%= item.visibility === "Private" ? "🔒 Private" : "🌐 Public" %>
+                                · <%= item.createdBy?.name || "Student" %>
+                            </span>
+
+                            <div class="complaint-card-actions">
+                                <% if (item.visibility === "Public" && currUser.accountType === "Student") { %>
+                                    <form method="POST" action="/complaints/<%= item._id %>/upvote">
+                                        <button class="upvote-button" type="submit">
+                                            ＋ <%= item.upvotes.length %>
+                                        </button>
+                                    </form>
+                                <% } else if (item.visibility === "Public") { %>
+                                    <span class="upvote-count">＋ <%= item.upvotes.length %></span>
+                                <% } %>
+
+                                <a href="/complaints/<%= item._id %>">View details →</a>
+                            </div>
+                        </div>
+                    </article>
+                <% }) %>
+            </div>
+        </section>
+
+        <aside class="complaint-panel trending-panel">
+            <span class="complaints-eyebrow">CAMPUS PULSE</span>
+            <h2>Trending complaints</h2>
+            <p class="trending-subtitle">Public issues with the most student support.</p>
+
+            <% if (!trending.length) { %>
+                <p>No public complaints yet.</p>
+            <% } else { %>
+                <ol class="trending-list">
+                    <% trending.forEach(item => { %>
+                        <li>
+                            <a href="/complaints/<%= item._id %>">
+                                <strong><%= item.title %></strong>
+                                <span><%= item.category %> · <%= item.subcategory %></span>
+                            </a>
+                            <b>＋ <%= item.upvotes.length %></b>
+                        </li>
+                    <% }) %>
+                </ol>
+            <% } %>
+        </aside>
+    </div>
+</div>
