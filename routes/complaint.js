@@ -3,6 +3,7 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const { isLoggedIn } = require("../middleware.js");
 const controller = require("../controllers/complaints.js");
 const Complaint = require("../models/complaint.js");
+const Notification = require("../models/notification.js");
 const router = express.Router();
 
 const staffOnly = (req, res, next) => {
@@ -35,6 +36,18 @@ const complaintOwnerOrStaff = async (req, res, next) => {
     res.locals.complaint = complaint;
     next();
 };
+router.get("/notifications", isLoggedIn, staffOnly, wrapAsync(async (req, res) => {
+    const notifications = await Notification.find({
+        recipient: req.user._id
+    })
+        .populate("complaint")
+        .sort({ createdAt: -1 });
+
+    res.render("complaints/notifications.ejs", {
+        notifications,
+        currUser: req.user
+    });
+}));
 router.get("/", isLoggedIn, wrapAsync(controller.index));
 router.get("/new", isLoggedIn, studentOnly, controller.renderNewForm);
 router.get("/mine", isLoggedIn, studentOnly, wrapAsync(controller.mine));

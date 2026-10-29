@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const subcategories = {
@@ -15,6 +16,13 @@ const complaintSchema = new mongoose.Schema({
     status: { type: String, enum: ["Unseen", "Seen", "In Process", "Done"], default: "Unseen", required: true },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+    // Prevent repeated lift threshold notifications
+    liftThresholdNotified: {
+        type: Boolean,
+        default: false
+    },
+
     updates: [{
         text: { type: String, required: true, trim: true, maxlength: 1000 },
         postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },

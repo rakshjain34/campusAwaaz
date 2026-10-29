@@ -1,0 +1,30 @@
+
+<% layout("layouts/boilerplate") %>
+
+<div class="container mt-4">
+    <h2>Lift Complaint Notifications</h2>
+
+    <% if (notifications.length === 0) { %>
+        <p>No notifications yet.</p>
+    <% } else { %>
+        <% notifications.forEach(notification => { %>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p><%= notification.message %></p>
+
+                    <% if (notification.complaint) { %>
+                        <a href="/complaints/<%= notification.complaint._id %>">
+                            View Complaint
+                        </a>
+                    <% } %>
+
+                    <small class="text-muted d-block">
+                        <%= notification.createdAt.toLocaleString() %>
+                    </small>
+                </div>
+            </div>
+        <% }) %>
+    <% } %>
+
+    <a href="/complaints">Back to Complaints</a>
+</div>

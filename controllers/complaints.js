@@ -1,5 +1,6 @@
 const Complaint = require("../models/complaint.js");
-
+const Notification = require("../models/notification.js");
+const User = require("../models/user.js");
 const canSee = (complaint, user) =>
     complaint.visibility === "Public" ||
     user?.accountType === "Staff" ||
@@ -166,6 +167,7 @@ module.exports.addUpdate = async (req, res) => {
     res.redirect(`/complaints/${complaint._id}`);
 };
 
+
 module.exports.upvote = async (req, res) => {
     const complaint = await Complaint.findById(req.params.id);
 
@@ -185,11 +187,34 @@ module.exports.upvote = async (req, res) => {
 
     if (!alreadyVoted) {
         complaint.upvotes.push(req.user._id);
+        
+        if (
+            complaint.subcategory === "Lift" &&
+            complaint.upvotes.length >= 20 &&
+            !complaint.liftThresholdNotified
+        ) {
+            complaint.urgency = "High";
+            complaint.liftThresholdNotified = true;
+
+            const staffMembers = await User.find({
+                accountType: "Staff"
+            }).select("_id");
+
+            for (const staff of staffMembers) {
+                await Notification.create({
+                    recipient: staff._id,
+                    complaint: complaint._id,
+                    message: `High priority: Lift complaint "${complaint.title}" has reached 20 student upvotes.`
+                });
+            }
+        }
+
         await complaint.save();
     }
 
     res.redirect(req.get("Referrer") || `/complaints/${complaint._id}`);
 };
+
 
 module.exports.delete = async (req, res) => {
     const complaint = await Complaint.findById(req.params.id);

@@ -12,6 +12,12 @@
                 <i class="fa-regular fa-clipboard"></i>
                 <span>Complaints</span>
             </a>
+                <% if (typeof currUser !== "undefined" && currUser && currUser.accountType === "Staff") { %>
+            <a href="/complaints/notifications" class="sidebar-link">
+                <i class="fa-regular fa-bell"></i>
+                <span>Notifications</span>
+            </a>
+                <% } %>
             <a href="/lostfound" class="sidebar-link">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <span>Lost & Found</span>
