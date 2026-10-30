@@ -86,7 +86,8 @@ main()
     .then(() => console.log('Connection successful'))
     .catch((err) => console.log(err));
 async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/campusAwaaz');
+    await mongoose.connect(process.env.ATLASDB_URL);
+    console.log('Connected to MongoDB Atlas!');
 }
 
 // Root Route
