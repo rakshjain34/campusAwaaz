@@ -1,26 +1,39 @@
-const express = require("express");
-const wrapAsync = require("../utils/wrapAsync.js");
+const express = require('express');
 const router = express.Router();
-const announcementController = require("../controllers/announcements.js");
-const { isLoggedIn, canPublishAnnouncement, isAnnouncementAuthor } = require("../middleware.js");
 
-router
-    .route("/")
-    .get(wrapAsync(announcementController.index))
-    .post(isLoggedIn, canPublishAnnouncement, wrapAsync(announcementController.create));
+const wrapAsync = require('../utils/wrapAsync.js');
+const controller = require('../controllers/announcements.js');
 
-router
-    .route("/new")
-    .get(isLoggedIn, canPublishAnnouncement, wrapAsync(announcementController.renderNewForm));
+const { isLoggedIn, canPublishAnnouncement, isAnnouncementAuthor } = require('../middleware.js');
 
-router
-    .route("/:id")
-    .get(wrapAsync(announcementController.show))
-    .put(isLoggedIn, isAnnouncementAuthor, wrapAsync(announcementController.update))
-    .delete(isLoggedIn, isAnnouncementAuthor, wrapAsync(announcementController.delete));
+const upload = require('../middleware/upload.js');
 
-router
-    .route("/:id/edit")
-    .get(isLoggedIn, isAnnouncementAuthor, wrapAsync(announcementController.renderEditForm));
+router.get('/', isLoggedIn, wrapAsync(controller.index));
+
+router.get('/mine', isLoggedIn, wrapAsync(controller.mine));
+
+router.get('/new', isLoggedIn, canPublishAnnouncement, wrapAsync(controller.renderNewForm));
+
+router.post(
+    '/',
+    isLoggedIn,
+    canPublishAnnouncement,
+    upload.single('attachment'),
+    wrapAsync(controller.create)
+);
+
+router.get('/:id/edit', isLoggedIn, isAnnouncementAuthor, wrapAsync(controller.renderEditForm));
+
+router.put(
+    '/:id',
+    isLoggedIn,
+    isAnnouncementAuthor,
+    upload.single('attachment'),
+    wrapAsync(controller.update)
+);
+
+router.delete('/:id', isLoggedIn, isAnnouncementAuthor, wrapAsync(controller.delete));
+
+router.get('/:id', isLoggedIn, wrapAsync(controller.show));
 
 module.exports = router;

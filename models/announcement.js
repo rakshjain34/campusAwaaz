@@ -1,16 +1,16 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const branches = [
-    "CSE",
-    "CSE (AI & DS)",
-    "MNC",
-    "ECE",
-    "EEE",
-    "Mechanical",
-    "Civil",
-    "Chemical",
-    "Biotechnology",
-    "Metallurgical and Materials Engineering"
+    'CSE',
+    'CSE (AI & DS)',
+    'MNC',
+    'ECE',
+    'EEE',
+    'Mechanical',
+    'Civil',
+    'Chemical',
+    'Biotechnology',
+    'Metallurgical and Materials Engineering',
 ];
 
 const announcementSchema = new mongoose.Schema(
@@ -19,104 +19,111 @@ const announcementSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
-            maxlength: 150
+            maxlength: 150,
         },
+
         description: {
             type: String,
             required: true,
             trim: true,
-            maxlength: 5000
+            maxlength: 5000,
         },
+
         category: {
             type: String,
-            enum: [
-                "Academic",
-                "Events",
-                "Clubs",
-                "Hostel",
-                "Placement",
-                "General"
-            ],
-            default: "General",
-            required: true
-        },
-        targetTypes: {
-            type: [{
-                type: String,
-                enum: ["Student", "Staff", "Everyone"]
-            }],
+            enum: ['Academic', 'Events', 'Clubs', 'Hostel', 'Placement', 'Examinations', 'General'],
+            default: 'General',
             required: true,
-            validate: {
-                validator: function (value) {
-                    return Array.isArray(value) && value.length > 0;
-                },
-                message: "Select at least one audience."
-            }
         },
-        staffAudience: {
-            type: [{
-                type: String,
-                enum: ["All", "Wardens"]
-            }],
-            default: ["All"]
+
+        scope: {
+            type: String,
+            enum: ['College', 'Class', 'Club'],
+            required: true,
         },
-        branches: {
-            type: [{
-                type: String,
-                enum: branches
-            }],
-            default: []
+
+        publisherRole: {
+            type: String,
+            enum: ['Staff', 'CR', 'GenSec'],
+            required: true,
         },
-        years: {
-            type: [{
-                type: Number,
-                enum: [1, 2, 3, 4]
-            }],
-            default: []
+
+        branch: {
+            type: String,
+            enum: branches,
         },
-        sections: {
-            type: [{
-                type: String,
-                enum: ["A", "B", "C", "D"]
-            }],
-            default: []
+
+        year: {
+            type: Number,
+            enum: [1, 2, 3, 4],
         },
+
+        section: {
+            type: String,
+            enum: ['A', 'B', 'C', 'D'],
+        },
+
+        club: {
+            type: String,
+            trim: true,
+        },
+
         priority: {
             type: String,
-            enum: ["Normal", "Important", "Urgent"],
-            default: "Normal"
+            enum: ['Normal', 'Important', 'Urgent'],
+            default: 'Normal',
         },
+
         attachment: {
             type: String,
-            default: ""
+            default: '',
         },
+
+        attachmentPublicId: {
+            type: String,
+            default: '',
+        },
+
         attachmentType: {
             type: String,
-            enum: ["image", "file", ""],
-            default: ""
+            enum: ['image', 'file', ''],
+            default: '',
         },
+
         postedBy: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true
+            ref: 'User',
+            required: true,
         },
+
         isPinned: {
             type: Boolean,
-            default: false
+            default: false,
         },
+
         expiresAt: {
             type: Date,
-            default: null
-        }
+            default: null,
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
 );
 
 announcementSchema.index({
-    title: "text",
-    description: "text"
+    title: 'text',
+    description: 'text',
 });
 
-module.exports = mongoose.model("Announcement", announcementSchema);
+announcementSchema.index({
+    scope: 1,
+    createdAt: -1,
+});
+
+announcementSchema.index({
+    postedBy: 1,
+    createdAt: -1,
+});
+
+module.exports = mongoose.model('Announcement', announcementSchema);

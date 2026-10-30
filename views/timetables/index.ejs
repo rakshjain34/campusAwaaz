@@ -1,0 +1,178 @@
+<% layout("/layouts/boilerplate") -%>
+
+<link rel="stylesheet" href="/css/announcements.css">
+<link rel="stylesheet" href="/css/timetables.css">
+
+<div class="ann-page">
+
+    <div class="ann-header">
+        <div>
+            <span class="ann-eyebrow">CAMPUS CENTRAL</span>
+            <h1>Timetables & Resources</h1>
+            <p>Find your class schedules, mess menus and important campus documents.</p>
+        </div>
+
+        <% if (allowedScopes.length > 0) { %>
+            <div class="tt-header-actions">
+                <a href="/timetables/mine" class="ann-btn ann-btn-light">
+                    <i class="fa-regular fa-folder-open"></i>
+                    My Uploads
+                </a>
+
+                <a href="/timetables/new" class="ann-btn ann-btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    Upload Resource
+                </a>
+            </div>
+        <% } %>
+    </div>
+
+
+    <div class="tt-category-grid">
+
+        <a href="/timetables" class="tt-category-card">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>All Resources</span>
+        </a>
+
+        <a href="/timetables?category=Mess%20Menu" class="tt-category-card">
+            <i class="fa-solid fa-utensils"></i>
+            <span>Mess Menu</span>
+        </a>
+
+        <a href="/timetables?category=Class%20Timetable" class="tt-category-card">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Class Timetable</span>
+        </a>
+
+        <a href="/timetables?category=Academic%20Calendar" class="tt-category-card">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Academic Calendar</span>
+        </a>
+
+        <a href="/timetables?category=Exam%20Schedule" class="tt-category-card">
+            <i class="fa-solid fa-book-open"></i>
+            <span>Exam Schedule</span>
+        </a>
+
+        <a href="/timetables?category=Holiday%20List" class="tt-category-card">
+            <i class="fa-solid fa-umbrella-beach"></i>
+            <span>Holiday List</span>
+        </a>
+
+    </div>
+
+
+    <form action="/timetables" method="GET" class="tt-filter-form">
+
+        <div class="ann-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Search resources..."
+                value="<%= filters.search %>"
+            >
+        </div>
+
+        <select name="category">
+            <option value="">All Categories</option>
+
+            <% [
+                "Mess Menu",
+                "Class Timetable",
+                "Academic Calendar",
+                "Exam Schedule",
+                "Holiday List",
+                "Other"
+            ].forEach(c => { %>
+
+                <option value="<%= c %>" <%= filters.category === c ? "selected" : "" %>>
+                    <%= c %>
+                </option>
+
+            <% }) %>
+        </select>
+
+        <button type="submit" class="ann-filter-btn">
+            Search
+        </button>
+
+        <a href="/timetables" class="ann-reset">Reset</a>
+
+    </form>
+
+
+    <div class="tt-resource-list">
+
+        <% if (timetables.length === 0) { %>
+
+            <div class="ann-empty">
+                <i class="fa-regular fa-calendar"></i>
+                <h3>No resources found</h3>
+                <p>Try another category or check back later.</p>
+            </div>
+
+        <% } %>
+
+
+        <% timetables.forEach(item => { %>
+
+            <article class="tt-resource-card">
+
+                <div class="tt-file-icon">
+                    <% if (item.attachmentType === "file") { %>
+                        <i class="fa-solid fa-file-pdf"></i>
+                    <% } else { %>
+                        <i class="fa-regular fa-image"></i>
+                    <% } %>
+                </div>
+
+
+                <div class="tt-resource-info">
+
+                    <div class="tt-resource-badges">
+                        <span class="ann-category"><%= item.category %></span>
+
+                        <span class="ann-scope">
+                            <%= item.scope === "College"
+                                ? "College"
+                                : item.scope === "Class"
+                                ? item.branch + " · Year " + item.year + " · " + item.section
+                                : item.club %>
+                        </span>
+                    </div>
+
+                    <a href="/timetables/<%= item._id %>" class="tt-resource-title">
+                        <%= item.title %>
+                    </a>
+
+                    <p>
+                        <%= item.description || "No additional description." %>
+                    </p>
+
+                    <small>
+                        Uploaded by <%= item.uploadedBy?.name || "Unknown" %>
+                        ·
+                        <%= new Date(item.createdAt).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric"
+                        }) %>
+                    </small>
+
+                </div>
+
+
+                <a href="/timetables/<%= item._id %>" class="tt-open-btn">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+
+            </article>
+
+        <% }) %>
+
+    </div>
+
+</div>

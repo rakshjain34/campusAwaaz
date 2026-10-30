@@ -1,0 +1,193 @@
+<% layout("/layouts/boilerplate") -%>
+
+<link rel="stylesheet" href="/css/announcements.css">
+<link rel="stylesheet" href="/css/timetables.css">
+
+<div class="ann-form-page">
+
+    <a href="/timetables" class="ann-back">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to resources
+    </a>
+
+    <div class="ann-form-heading">
+        <span class="ann-eyebrow">CAMPUS CENTRAL</span>
+        <h1>Upload Resource</h1>
+        <p>Share a timetable, mess menu or important document.</p>
+    </div>
+
+
+    <form
+        action="/timetables"
+        method="POST"
+        enctype="multipart/form-data"
+        class="ann-form"
+    >
+
+        <div class="ann-form-group">
+            <label>Resource Title *</label>
+
+            <input
+                type="text"
+                name="timetable[title]"
+                placeholder="e.g. CSE 3rd Semester Timetable"
+                maxlength="150"
+                required
+            >
+        </div>
+
+
+        <div class="ann-form-group">
+            <label>Description</label>
+
+            <textarea
+                name="timetable[description]"
+                rows="4"
+                maxlength="1000"
+                placeholder="Add any additional information..."
+            ></textarea>
+        </div>
+
+
+        <div class="ann-form-group">
+            <label>Category *</label>
+
+            <select name="timetable[category]" required>
+                <option value="">Select category</option>
+                <option value="Mess Menu">Mess Menu</option>
+                <option value="Class Timetable">Class Timetable</option>
+                <option value="Academic Calendar">Academic Calendar</option>
+                <option value="Exam Schedule">Exam Schedule</option>
+                <option value="Holiday List">Holiday List</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+
+        <% 
+            const clubs = [...new Set(
+                allowedScopes
+                    .filter(s => s.scope === "Club")
+                    .map(s => s.club)
+            )];
+
+            const hasMultipleScopes = allowedScopes.length > 1;
+        %>
+
+
+        <% if (hasMultipleScopes) { %>
+
+            <div class="ann-form-group">
+                <label>Publish To *</label>
+
+                <select name="timetable[scope]" id="ttScope" required>
+
+                    <option value="">Choose audience</option>
+
+                    <% if (allowedScopes.some(s => s.scope === "College")) { %>
+                        <option value="College">Entire College</option>
+                    <% } %>
+
+                    <% if (allowedScopes.some(s => s.scope === "Class")) { %>
+                        <option value="Class">My Class</option>
+                    <% } %>
+
+                    <% if (clubs.length > 0) { %>
+                        <option value="Club">My Club</option>
+                    <% } %>
+
+                </select>
+            </div>
+
+        <% } else { %>
+
+            <input
+                type="hidden"
+                name="timetable[scope]"
+                value="<%= allowedScopes[0].scope %>"
+            >
+
+            <div class="ann-scope-info">
+                <i class="fa-solid fa-lock"></i>
+                Publishing to:
+
+                <strong>
+                    <%= allowedScopes[0].scope === "College"
+                        ? "Entire College"
+                        : allowedScopes[0].scope === "Class"
+                        ? allowedScopes[0].branch + " · Year " + allowedScopes[0].year + " · " + allowedScopes[0].section
+                        : allowedScopes[0].club %>
+                </strong>
+            </div>
+
+        <% } %>
+
+
+        <% if (clubs.length > 0) { %>
+
+            <div
+                class="ann-form-group"
+                id="ttClubGroup"
+                style="<%= hasMultipleScopes ? 'display:none' : (allowedScopes[0].scope === 'Club' ? '' : 'display:none') %>"
+            >
+
+                <label>Select Club *</label>
+
+                <select name="timetable[club]" id="ttClub">
+
+                    <% clubs.forEach(club => { %>
+                        <option value="<%= club %>"><%= club %></option>
+                    <% }) %>
+
+                </select>
+
+            </div>
+
+        <% } %>
+
+
+        <div class="ann-form-group">
+            <label>Upload File *</label>
+
+            <label for="ttAttachment" class="ann-upload-box">
+
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                <strong>Choose an image or PDF</strong>
+
+                <span>JPG, PNG, WEBP or PDF · Maximum 10 MB</span>
+
+                <input
+                    type="file"
+                    id="ttAttachment"
+                    name="attachment"
+                    accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
+                    required
+                >
+
+            </label>
+
+            <div id="ttFilePreview" class="tt-file-preview"></div>
+
+        </div>
+
+
+        <div class="ann-form-actions">
+
+            <a href="/timetables" class="ann-btn ann-btn-light">
+                Cancel
+            </a>
+
+            <button type="submit" class="ann-btn ann-btn-primary">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                Publish Resource
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script src="/js/timetables.js"></script>

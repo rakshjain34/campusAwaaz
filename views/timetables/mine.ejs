@@ -1,0 +1,89 @@
+<% layout("/layouts/boilerplate") -%>
+
+<link rel="stylesheet" href="/css/announcements.css">
+<link rel="stylesheet" href="/css/timetables.css">
+
+<div class="ann-page">
+
+    <div class="ann-header">
+
+        <div>
+            <span class="ann-eyebrow">YOUR ACTIVITY</span>
+            <h1>My Uploads</h1>
+            <p>Manage the resources you have shared.</p>
+        </div>
+
+        <a href="/timetables/new" class="ann-btn ann-btn-primary">
+            <i class="fa-solid fa-plus"></i>
+            Upload Resource
+        </a>
+
+    </div>
+
+
+    <div class="tt-resource-list">
+
+        <% if (timetables.length === 0) { %>
+
+            <div class="ann-empty">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>No uploads yet</h3>
+                <p>Your uploaded resources will appear here.</p>
+            </div>
+
+        <% } %>
+
+
+        <% timetables.forEach(item => { %>
+
+            <article class="tt-resource-card">
+
+                <div class="tt-file-icon">
+                    <% if (item.attachmentType === "file") { %>
+                        <i class="fa-solid fa-file-pdf"></i>
+                    <% } else { %>
+                        <i class="fa-regular fa-image"></i>
+                    <% } %>
+                </div>
+
+
+                <div class="tt-resource-info">
+
+                    <span class="ann-category"><%= item.category %></span>
+
+                    <a href="/timetables/<%= item._id %>" class="tt-resource-title">
+                        <%= item.title %>
+                    </a>
+
+                    <small>
+                        Uploaded on
+                        <%= new Date(item.createdAt).toLocaleDateString("en-IN") %>
+                    </small>
+
+                    <div class="ann-my-actions">
+
+                        <a href="/timetables/<%= item._id %>/edit">
+                            <i class="fa-solid fa-pen"></i> Edit
+                        </a>
+
+                        <form
+                            action="/timetables/<%= item._id %>?_method=DELETE"
+                            method="POST"
+                            onsubmit="return confirm('Delete this resource?')"
+                        >
+                            <button type="submit">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        <% }) %>
+
+    </div>
+
+</div>

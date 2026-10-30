@@ -1,86 +1,296 @@
 <% layout("/layouts/boilerplate") -%>
-<div class="container announcement-index-page">
-    <div class="announcement-index-header">
+
+<link rel="stylesheet" href="/css/announcements.css">
+
+<div class="ann-page">
+
+    <div class="ann-header">
         <div>
-            <span class="announcement-eyebrow"><i class="fa-solid fa-leaf me-2"></i>CAMPUSAWAAZ</span>
+            <span class="ann-eyebrow">CAMPUS CENTRAL</span>
             <h1>Announcements</h1>
-            <p>Stay updated with everything happening around your campus.</p>
+            <p>Stay updated with everything happening around campus.</p>
         </div>
-        <% if (currUser && (currUser.accountType === "Staff" || (currUser.accountType === "Student" && ["CR", "GenSec"].includes(currUser.studentRole)))) { %>
-            <a href="/announcements/new" class="btn btn-announcement-submit">
-                <i class="fa-solid fa-plus me-2"></i>New Announcement
-            </a>
+
+        <% if (allowedScopes.length > 0) { %>
+            <div class="ann-header-actions">
+                <a href="/announcements/mine" class="ann-btn ann-btn-light">
+                    <i class="fa-regular fa-folder-open"></i> My Posts
+                </a>
+
+                <a href="/announcements/new" class="ann-btn ann-btn-primary">
+                    <i class="fa-solid fa-plus"></i> New Announcement
+                </a>
+            </div>
         <% } %>
     </div>
-    <div class="announcement-index-banner">
-        <div class="announcement-banner-icon">
-            <i class="fa-solid fa-bullhorn"></i>
-        </div>
-        <div>
-            <h5>What's happening on campus?</h5>
-            <p>Important notices, upcoming events, academic updates, and more—all in one place.</p>
-        </div>
+
+
+    <!-- CATEGORY TABS -->
+
+    <div class="ann-tabs">
+
+        <a href="/announcements?scope=all"
+           class="<%= activeScope === 'all' ? 'active' : '' %>">
+            <i class="fa-solid fa-layer-group"></i>
+            All
+        </a>
+
+        <a href="/announcements?scope=College"
+           class="<%= activeScope === 'College' ? 'active' : '' %>">
+            <i class="fa-solid fa-building-columns"></i>
+            College
+        </a>
+
+        <a href="/announcements?scope=Class"
+           class="<%= activeScope === 'Class' ? 'active' : '' %>">
+            <i class="fa-solid fa-users"></i>
+            My Class
+        </a>
+
+        <a href="/announcements?scope=Club"
+           class="<%= activeScope === 'Club' ? 'active' : '' %>">
+            <i class="fa-solid fa-people-group"></i>
+            My Clubs
+        </a>
+
     </div>
-    <% if (announcements.length === 0) { %>
-        <div class="announcement-empty-state">
-            <div class="announcement-empty-icon">
-                <i class="fa-regular fa-bell-slash"></i>
-            </div>
-            <h4>No announcements yet</h4>
-            <p>Check back later for updates from your campus community.</p>
+
+
+    <!-- FILTERS -->
+
+    <form action="/announcements" method="GET" class="ann-filter-form">
+
+        <input type="hidden" name="scope" value="<%= activeScope %>">
+
+        <div class="ann-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+                type="text"
+                name="search"
+                placeholder="Search announcements..."
+                value="<%= filters.search %>"
+            >
         </div>
-    <% } else { %>
-        <div class="announcement-list">
-            <% announcements.forEach(announcement => {
-                const targetTypes = announcement.targetTypes || [];
-                const staffAudiences = Array.isArray(announcement.staffAudience) ? announcement.staffAudience : announcement.staffAudience ? [announcement.staffAudience] : [];
-                const branches = announcement.branches || [];
-                const years = announcement.years || [];
-                const sections = announcement.sections || [];
-                const audienceLabels = [];
 
-                if (targetTypes.includes("Everyone")) {
-                    audienceLabels.push("Everyone");
-                } else {
-                    if (targetTypes.includes("Student")) {
-                        const branchLabel = branches.length ? branches.join(", ") : "All Branches";
-                        const yearLabel = years.length ? years.map(year => `${year}${year === 1 ? "st" : year === 2 ? "nd" : year === 3 ? "rd" : "th"} Year`).join(", ") : "All Years";
-                        const sectionLabel = sections.length ? sections.map(section => `Section ${section}`).join(", ") : "All Sections";
-                        audienceLabels.push(`Students: ${branchLabel} | ${yearLabel} | ${sectionLabel}`);
-                    }
+        <select name="category">
+            <option value="">All Categories</option>
 
-                    if (targetTypes.includes("Staff")) {
-                        const staffLabel = staffAudiences.includes("All") || !staffAudiences.length ? "All Staff" : staffAudiences.join(", ");
-                        audienceLabels.push(`Staff: ${staffLabel}`);
-                    }
-                }
-            %>
-                <div class="announcement-list-card">
-                    <div class="announcement-list-card-top">
-                        <span class="announcement-category-badge"><i class="fa-solid fa-tag me-2"></i><%= announcement.category %></span>
-                        <span class="announcement-date"><i class="fa-regular fa-calendar me-2"></i><%= new Date(announcement.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) %></span>
-                    </div>
-                    <% if (announcement.isPinned) { %>
-                        <span class="announcement-category-badge"><i class="fa-solid fa-thumbtack me-2"></i>Pinned</span>
-                    <% } %>
-                    <h4><%= announcement.title %></h4>
-                    <p class="announcement-list-excerpt"><%= announcement.description.length > 180 ? announcement.description.substring(0, 180) + "..." : announcement.description %></p>
-                    <div class="announcement-meta mb-3">
-                        <span class="announcement-category-badge"><i class="fa-solid fa-users me-2"></i><%= audienceLabels.join(" • ") || "Audience not specified" %></span>
-                        <span class="announcement-category-badge"><i class="fa-solid fa-flag me-2"></i><%= announcement.priority %></span>
-                    </div>
-                    <div class="announcement-list-card-bottom">
-                        <div class="announcement-list-author">
-                            <span class="announcement-list-author-icon"><i class="fa-solid fa-user"></i></span>
-                            <div>
-                                <span class="announcement-list-author-name"><%= announcement.postedBy ? announcement.postedBy.name : "Unknown Author" %></span>
-                                <span class="announcement-list-author-role"><%= announcement.postedBy ? (announcement.postedBy.accountType === "Staff" ? (announcement.postedBy.designation || "Staff") : (announcement.postedBy.studentRole || "Student")) : "CampusAwaaz Member" %></span>
-                            </div>
-                        </div>
-                        <a href="/announcements/<%= announcement._id %>" class="announcement-read-more">Read More <i class="fa-solid fa-arrow-right ms-2"></i></a>
-                    </div>
-                </div>
+            <% ["Academic", "Events", "Clubs", "Hostel", "Placement", "Examinations", "General"].forEach(c => { %>
+                <option value="<%= c %>" <%= filters.category === c ? "selected" : "" %>>
+                    <%= c %>
+                </option>
             <% }) %>
+        </select>
+
+        <select name="priority">
+            <option value="">All Priorities</option>
+
+            <% ["Normal", "Important", "Urgent"].forEach(p => { %>
+                <option value="<%= p %>" <%= filters.priority === p ? "selected" : "" %>>
+                    <%= p %>
+                </option>
+            <% }) %>
+        </select>
+
+        <button type="submit" class="ann-filter-btn">
+            Filter
+        </button>
+
+        <a href="/announcements?scope=<%= activeScope %>" class="ann-reset">
+            Reset
+        </a>
+
+    </form>
+
+
+    <!-- ANNOUNCEMENT LIST -->
+<!-- TIMETABLES AND RESOURCES -->
+
+<section class="ann-resources-section">
+
+    <div class="ann-resource-heading">
+
+        <div>
+            <span class="ann-eyebrow">QUICK ACCESS</span>
+            <h2>Timetables & Resources</h2>
+            <p>Everything you need, organised in one place.</p>
         </div>
+
+        <a href="/timetables" class="ann-resource-view">
+            View all <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+    </div>
+
+
+    <div class="ann-resource-grid">
+
+        <% if (timetables.length === 0) { %>
+
+            <div class="ann-resource-empty">
+                <i class="fa-regular fa-calendar"></i>
+                <h3>No resources uploaded yet</h3>
+                <p>Timetables and campus resources will appear here.</p>
+            </div>
+
+        <% } %>
+
+
+        <% timetables.forEach(item => { %>
+
+            <a href="/timetables/<%= item._id %>" class="ann-resource-card">
+
+                <div class="ann-resource-icon">
+
+                    <% if (item.attachmentType === "file") { %>
+                        <i class="fa-solid fa-file-pdf"></i>
+                    <% } else { %>
+                        <i class="fa-regular fa-image"></i>
+                    <% } %>
+
+                </div>
+
+                <div class="ann-resource-content">
+
+                    <span><%= item.category %></span>
+
+                    <h3><%= item.title %></h3>
+
+                    <small>
+                        <%= item.scope === "College"
+                            ? "College"
+                            : item.scope === "Class"
+                            ? item.branch + " · Year " + item.year + " · " + item.section
+                            : item.club %>
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right ann-resource-arrow"></i>
+
+            </a>
+
+        <% }) %>
+
+    </div>
+
+
+    <% if (allowedScopes.length > 0) { %>
+
+        <a href="/timetables/new" class="ann-upload-resource">
+            <i class="fa-solid fa-plus"></i>
+            Upload a timetable or resource
+        </a>
+
     <% } %>
+
+</section>
+    <div class="ann-list">
+
+        <% if (announcements.length === 0) { %>
+
+            <div class="ann-empty">
+                <div class="ann-empty-icon">
+                    <i class="fa-regular fa-bell-slash"></i>
+                </div>
+
+                <h3>No announcements found</h3>
+                <p>There are no announcements matching your filters right now.</p>
+
+                <% if (allowedScopes.length > 0) { %>
+                    <a href="/announcements/new" class="ann-btn ann-btn-primary">
+                        Create an announcement
+                    </a>
+                <% } %>
+            </div>
+
+        <% } %>
+
+
+        <% announcements.forEach(announcement => { %>
+
+            <article class="ann-card">
+
+                <% if (announcement.isPinned) { %>
+                    <div class="ann-pinned">
+                        <i class="fa-solid fa-thumbtack"></i> PINNED
+                    </div>
+                <% } %>
+
+                <div class="ann-card-top">
+
+                    <div class="ann-badges">
+                        <span class="ann-category">
+                            <%= announcement.category %>
+                        </span>
+
+                        <span class="ann-scope">
+                            <%= announcement.scope === "College"
+                                ? "College"
+                                : announcement.scope === "Class"
+                                ? announcement.branch + " · Year " + announcement.year + " · " + announcement.section
+                                : announcement.club %>
+                        </span>
+                    </div>
+
+                    <span class="ann-priority <%= announcement.priority.toLowerCase() %>">
+                        <%= announcement.priority %>
+                    </span>
+
+                </div>
+
+
+                <a href="/announcements/<%= announcement._id %>" class="ann-card-title">
+                    <%= announcement.title %>
+                </a>
+
+                <p class="ann-description">
+                    <%= announcement.description.length > 220
+                        ? announcement.description.substring(0, 220) + "..."
+                        : announcement.description %>
+                </p>
+
+
+                <% if (announcement.attachment && announcement.attachmentType === "image") { %>
+                    <a href="<%= announcement.attachment %>" target="_blank">
+                        <img
+                            src="<%= announcement.attachment %>"
+                            class="ann-card-image"
+                            alt="Announcement attachment"
+                        >
+                    </a>
+                <% } %>
+
+
+                <div class="ann-card-footer">
+
+                    <div class="ann-author">
+                        <div class="ann-avatar">
+                            <%= announcement.postedBy?.name?.charAt(0) || "U" %>
+                        </div>
+
+                        <div>
+                            <strong><%= announcement.postedBy?.name || "Unknown" %></strong>
+                            <small>
+                                <%= new Date(announcement.createdAt).toLocaleDateString("en-IN", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric"
+                                }) %>
+                            </small>
+                        </div>
+                    </div>
+
+                    <a href="/announcements/<%= announcement._id %>" class="ann-read-more">
+                        Read more <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </article>
+
+        <% }) %>
+
+    </div>
+
 </div>

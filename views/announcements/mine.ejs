@@ -1,0 +1,102 @@
+<% layout("/layouts/boilerplate") -%>
+
+<link rel="stylesheet" href="/css/announcements.css">
+
+<div class="ann-page">
+
+    <div class="ann-header">
+
+        <div>
+            <span class="ann-eyebrow">YOUR ACTIVITY</span>
+            <h1>My Announcements</h1>
+            <p>Manage the announcements you have published.</p>
+        </div>
+
+        <a href="/announcements/new" class="ann-btn ann-btn-primary">
+            <i class="fa-solid fa-plus"></i> New Announcement
+        </a>
+
+    </div>
+
+
+    <div class="ann-list">
+
+        <% if (announcements.length === 0) { %>
+
+            <div class="ann-empty">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>You haven't posted anything yet.</h3>
+                <p>Your published announcements will appear here.</p>
+            </div>
+
+        <% } %>
+
+
+        <% announcements.forEach(announcement => { %>
+
+            <article class="ann-card">
+
+                <div class="ann-card-top">
+
+                    <div class="ann-badges">
+                        <span class="ann-category">
+                            <%= announcement.category %>
+                        </span>
+
+                        <span class="ann-scope">
+                            <%= announcement.scope %>
+                        </span>
+                    </div>
+
+                    <span class="ann-priority <%= announcement.priority.toLowerCase() %>">
+                        <%= announcement.priority %>
+                    </span>
+
+                </div>
+
+
+                <a href="/announcements/<%= announcement._id %>" class="ann-card-title">
+                    <%= announcement.title %>
+                </a>
+
+                <p class="ann-description">
+                    <%= announcement.description.length > 180
+                        ? announcement.description.substring(0, 180) + "..."
+                        : announcement.description %>
+                </p>
+
+
+                <div class="ann-card-footer">
+
+                    <small>
+                        Published:
+                        <%= new Date(announcement.createdAt).toLocaleDateString("en-IN") %>
+                    </small>
+
+                    <div class="ann-my-actions">
+
+                        <a href="/announcements/<%= announcement._id %>/edit">
+                            <i class="fa-solid fa-pen"></i> Edit
+                        </a>
+
+                        <form
+                            action="/announcements/<%= announcement._id %>?_method=DELETE"
+                            method="POST"
+                            onsubmit="return confirm('Delete this announcement?')"
+                        >
+                            <button type="submit">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        <% }) %>
+
+    </div>
+
+</div>

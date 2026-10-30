@@ -1,70 +1,66 @@
-const Complaint = require("../models/complaint.js");
-const Notification = require("../models/notification.js");
-const User = require("../models/user.js");
+const Complaint = require('../models/complaint.js');
+const Notification = require('../models/notification.js');
+const User = require('../models/user.js');
 const canSee = (complaint, user) =>
-    complaint.visibility === "Public" ||
-    user?.accountType === "Staff" ||
+    complaint.visibility === 'Public' ||
+    user?.accountType === 'Staff' ||
     complaint.createdBy?._id?.toString() === user?._id?.toString() ||
     complaint.createdBy?.toString() === user?._id?.toString();
 
 module.exports.index = async (req, res) => {
-    const filter = req.user.accountType === "Staff"
-        ? { status: { $ne: "Done" } }
-        : {
-            status: { $ne: "Done" },
-            $or: [
-                { visibility: "Public" },
-                { createdBy: req.user._id }
-            ]
-        };
+    const filter =
+        req.user.accountType === 'Staff'
+            ? { status: { $ne: 'Done' } }
+            : {
+                  status: { $ne: 'Done' },
+                  $or: [{ visibility: 'Public' }, { createdBy: req.user._id }],
+              };
 
     if (req.query.category) filter.category = req.query.category;
     if (req.query.subcategory) filter.subcategory = req.query.subcategory;
 
-    if (req.user.accountType === "Staff" && req.query.urgency) {
+    if (req.user.accountType === 'Staff' && req.query.urgency) {
         filter.urgency = req.query.urgency;
     }
 
     const complaints = await Complaint.find(filter)
-        .populate("createdBy", "name accountType")
+        .populate('createdBy', 'name accountType')
         .sort({ createdAt: -1 });
 
-    const trending = (await Complaint.find({
-        visibility: "Public",
-        status: { $ne: "Done" }
-    }))
-        .sort((a, b) =>
-            b.upvotes.length - a.upvotes.length ||
-            b.createdAt - a.createdAt
-        )
+    const trending = (
+        await Complaint.find({
+            visibility: 'Public',
+            status: { $ne: 'Done' },
+        })
+    )
+        .sort((a, b) => b.upvotes.length - a.upvotes.length || b.createdAt - a.createdAt)
         .slice(0, 5);
 
-    res.render("complaints/index.ejs", {
+    res.render('complaints/index.ejs', {
         complaints,
         trending,
         currUser: req.user,
-        filters: req.query
+        filters: req.query,
     });
 };
 
 module.exports.mine = async (req, res) => {
-    const complaints = await Complaint.find({ createdBy: req.user._id })
-        .sort({ createdAt: -1 });
+    const complaints = await Complaint.find({ createdBy: req.user._id }).sort({ createdAt: -1 });
 
-    res.render("complaints/mine.ejs", {
+    res.render('complaints/mine.ejs', {
         complaints,
-        currUser: req.user
+        currUser: req.user,
     });
 };
 
 module.exports.renderNewForm = (req, res) => {
-    res.render("complaints/new.ejs");
+    res.render('complaints/new.ejs');
 };
 
 module.exports.create = async (req, res) => {
-    if (req.user.accountType !== "Student") {
-        req.flash("error", "Only students can submit complaints.");
-        return res.redirect("/complaints");
+    if (req.user.accountType !== 'Student') {
+        req.flash('error', 'Only students can submit complaints.');
+        return res.redirect('/complaints');
     }
 
     const data = req.body.complaint || {};
@@ -75,32 +71,32 @@ module.exports.create = async (req, res) => {
         subcategory: data.subcategory,
         urgency: data.urgency,
         visibility: data.visibility,
-        createdBy: req.user._id
+        createdBy: req.user._id,
     });
 
     await complaint.save();
-    req.flash("success", "Your complaint has been submitted.");
+    req.flash('success', 'Your complaint has been submitted.');
     res.redirect(`/complaints/${complaint._id}`);
 };
 
 module.exports.show = async (req, res) => {
     const complaint = await Complaint.findById(req.params.id)
-        .populate("createdBy", "name accountType")
-        .populate("updates.postedBy", "name designation");
+        .populate('createdBy', 'name accountType')
+        .populate('updates.postedBy', 'name designation');
 
     if (!complaint) {
-        req.flash("error", "Complaint not found.");
-        return res.redirect("/complaints");
+        req.flash('error', 'Complaint not found.');
+        return res.redirect('/complaints');
     }
 
     if (!canSee(complaint, req.user)) {
-        req.flash("error", "You do not have permission to view this private complaint.");
-        return res.redirect("/complaints");
+        req.flash('error', 'You do not have permission to view this private complaint.');
+        return res.redirect('/complaints');
     }
 
-    res.render("complaints/show.ejs", {
+    res.render('complaints/show.ejs', {
         complaint,
-        currUser: req.user
+        currUser: req.user,
     });
 };
 
@@ -108,18 +104,18 @@ module.exports.renderEditForm = async (req, res) => {
     const complaint = await Complaint.findById(req.params.id);
 
     if (!complaint) {
-        req.flash("error", "Complaint not found.");
-        return res.redirect("/complaints");
+        req.flash('error', 'Complaint not found.');
+        return res.redirect('/complaints');
     }
 
-    res.render("complaints/edit.ejs", { complaint });
+    res.render('complaints/edit.ejs', { complaint });
 };
 
 module.exports.updateStatus = async (req, res) => {
-    const allowedStatuses = ["Unseen", "Seen", "In Process", "Done"];
+    const allowedStatuses = ['Unseen', 'Seen', 'In Process', 'Done'];
 
     if (!allowedStatuses.includes(req.body.status)) {
-        req.flash("error", "Choose a valid complaint status.");
+        req.flash('error', 'Choose a valid complaint status.');
         return res.redirect(`/complaints/${req.params.id}`);
     }
 
@@ -130,81 +126,78 @@ module.exports.updateStatus = async (req, res) => {
     );
 
     if (!complaint) {
-        req.flash("error", "Complaint not found.");
-        return res.redirect("/complaints");
+        req.flash('error', 'Complaint not found.');
+        return res.redirect('/complaints');
     }
 
-    req.flash("success", "Complaint status updated.");
+    req.flash('success', 'Complaint status updated.');
 
-    if (req.body.status === "Done") {
-        return res.redirect("/complaints");
+    if (req.body.status === 'Done') {
+        return res.redirect('/complaints');
     }
 
     res.redirect(`/complaints/${complaint._id}`);
 };
 
 module.exports.addUpdate = async (req, res) => {
-    const text = (req.body.text || "").trim();
+    const text = (req.body.text || '').trim();
     const complaint = await Complaint.findById(req.params.id);
 
     if (!complaint) {
-        req.flash("error", "Complaint not found.");
-        return res.redirect("/complaints");
+        req.flash('error', 'Complaint not found.');
+        return res.redirect('/complaints');
     }
 
     if (!text || text.length > 1000) {
-        req.flash("error", "Update must be between 1 and 1000 characters.");
+        req.flash('error', 'Update must be between 1 and 1000 characters.');
         return res.redirect(`/complaints/${complaint._id}`);
     }
 
     complaint.updates.push({
         text,
-        postedBy: req.user._id
+        postedBy: req.user._id,
     });
 
     await complaint.save();
-    req.flash("success", "Update posted.");
+    req.flash('success', 'Update posted.');
     res.redirect(`/complaints/${complaint._id}`);
 };
-
 
 module.exports.upvote = async (req, res) => {
     const complaint = await Complaint.findById(req.params.id);
 
-    if (!complaint || complaint.visibility !== "Public") {
-        req.flash("error", "That public complaint could not be found.");
-        return res.redirect("/complaints");
+    if (!complaint || complaint.visibility !== 'Public') {
+        req.flash('error', 'That public complaint could not be found.');
+        return res.redirect('/complaints');
     }
 
-    if (req.user.accountType !== "Student") {
-        req.flash("error", "Only students can upvote complaints.");
+    if (req.user.accountType !== 'Student') {
+        req.flash('error', 'Only students can upvote complaints.');
         return res.redirect(`/complaints/${complaint._id}`);
     }
 
-    const alreadyVoted = complaint.upvotes.some(
-        id => id.toString() === req.user._id.toString()
-    );
+    const alreadyVoted = complaint.upvotes.some((id) => id.toString() === req.user._id.toString());
 
     if (!alreadyVoted) {
         complaint.upvotes.push(req.user._id);
-        
+
         if (
-            complaint.subcategory === "Lift" &&
+            complaint.subcategory === 'Lift' &&
             complaint.upvotes.length >= 20 &&
             !complaint.liftThresholdNotified
         ) {
-            complaint.urgency = "High";
+            complaint.urgency = 'High';
             complaint.liftThresholdNotified = true;
 
             const staffMembers = await User.find({
-                accountType: "Staff"
-            }).select("_id");
+                accountType: 'Staff',
+            }).select('_id');
 
             for (const staff of staffMembers) {
                 await Notification.create({
                     recipient: staff._id,
                     complaint: complaint._id,
-                    message: `High priority: Lift complaint "${complaint.title}" has reached 20 student upvotes.`
+                    message: `High priority: Lift complaint "${complaint.title}" has reached 20 student upvotes.`,
                 });
             }
         }
@@ -212,19 +205,18 @@ module.exports.upvote = async (req, res) => {
         await complaint.save();
     }
 
-    res.redirect(req.get("Referrer") || `/complaints/${complaint._id}`);
+    res.redirect(req.get('Referrer') || `/complaints/${complaint._id}`);
 };
-
 
 module.exports.delete = async (req, res) => {
     const complaint = await Complaint.findById(req.params.id);
 
     if (!complaint) {
-        req.flash("error", "Complaint not found.");
-        return res.redirect("/complaints");
+        req.flash('error', 'Complaint not found.');
+        return res.redirect('/complaints');
     }
 
     await complaint.deleteOne();
-    req.flash("success", "Complaint deleted.");
-    res.redirect("/complaints");
+    req.flash('success', 'Complaint deleted.');
+    res.redirect('/complaints');
 };

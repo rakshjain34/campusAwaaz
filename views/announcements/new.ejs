@@ -1,133 +1,172 @@
 <% layout("/layouts/boilerplate") -%>
-<div class="announcement-form-page">
-    <div class="announcement-form-card">
-        <div class="announcement-form-header">
-            <div class="announcement-icon">
-                <i class="fa-solid fa-bullhorn"></i>
-            </div>
-            <h1>Publish an Announcement</h1>
-            <p>Share important updates with the NIT Warangal community.</p>
+
+<link rel="stylesheet" href="/css/announcements.css">
+
+<div class="ann-form-page">
+
+    <a href="/announcements" class="ann-back">
+        <i class="fa-solid fa-arrow-left"></i> Back to announcements
+    </a>
+
+    <div class="ann-form-heading">
+        <span class="ann-eyebrow">CAMPUS CENTRAL</span>
+        <h1>Create Announcement</h1>
+        <p>Share important information with your campus community.</p>
+    </div>
+
+
+    <form
+        action="/announcements"
+        method="POST"
+        enctype="multipart/form-data"
+        class="ann-form"
+    >
+
+        <div class="ann-form-group">
+            <label>Announcement Title *</label>
+
+            <input
+                type="text"
+                name="announcement[title]"
+                placeholder="Give your announcement a title"
+                maxlength="150"
+                required
+            >
         </div>
-        <form action="/announcements" method="POST" id="announcementForm">
-            <div class="mb-4">
-                <label for="title" class="form-label">Announcement Title</label>
-                <input type="text" id="title" name="announcement[title]" class="form-control" placeholder="Enter a clear, descriptive title" maxlength="150" required>
-            </div>
-            <div class="mb-4">
-                <label for="category" class="form-label">Category</label>
-                <select id="category" name="announcement[category]" class="form-select" required>
-                    <option value="" selected disabled>Select a category</option>
+
+
+        <div class="ann-form-group">
+            <label>Description *</label>
+
+            <textarea
+                name="announcement[description]"
+                rows="7"
+                maxlength="5000"
+                placeholder="Write the details here..."
+                required
+            ></textarea>
+
+            <small>Maximum 5000 characters.</small>
+        </div>
+
+
+        <div class="ann-form-grid">
+
+            <div class="ann-form-group">
+                <label>Category *</label>
+
+                <select name="announcement[category]" required>
+                    <option value="General">General</option>
                     <option value="Academic">Academic</option>
                     <option value="Events">Events</option>
                     <option value="Clubs">Clubs</option>
                     <option value="Hostel">Hostel</option>
                     <option value="Placement">Placement</option>
-                    <option value="General">General</option>
+                    <option value="Examinations">Examinations</option>
                 </select>
             </div>
-            <div class="mb-4">
-                <label for="description" class="form-label">Announcement Details</label>
-                <textarea id="description" name="announcement[description]" class="form-control" rows="7" maxlength="5000" placeholder="Write all the important details here..." required></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="form-label">Who is this announcement for?</label>
-                <p class="text-muted small">Select one or more audiences.</p>
-                <div class="d-flex flex-wrap gap-3">
-                    <div class="form-check">
-                        <input class="form-check-input audience-checkbox" type="checkbox" id="audienceEveryone" name="announcement[targetTypes]" value="Everyone">
-                        <label class="form-check-label" for="audienceEveryone">Everyone</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input audience-checkbox" type="checkbox" id="audienceStudents" name="announcement[targetTypes]" value="Student">
-                        <label class="form-check-label" for="audienceStudents">Students</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input audience-checkbox" type="checkbox" id="audienceStaff" name="announcement[targetTypes]" value="Staff">
-                        <label class="form-check-label" for="audienceStaff">Staff</label>
-                    </div>
-                </div>
-                <div id="audienceError" class="text-danger small mt-2" hidden>Select at least one audience.</div>
-            </div>
-            <div class="mb-4" id="staffAudienceGroup" style="display: none;">
-                <label class="form-label">Staff Audience</label>
-                <p class="text-muted small">Select one or more staff groups.</p>
-                <div class="d-flex flex-wrap gap-3">
-                    <div class="form-check">
-                        <input class="form-check-input staff-audience-checkbox" type="checkbox" id="staffAll" name="announcement[staffAudience]" value="All">
-                        <label class="form-check-label" for="staffAll">All Staff</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input staff-audience-checkbox" type="checkbox" id="staffWardens" name="announcement[staffAudience]" value="Wardens">
-                        <label class="form-check-label" for="staffWardens">Wardens Only</label>
-                    </div>
-                </div>
-            </div>
-            <div id="studentAudienceGroup" style="display: none;">
-                <div class="mb-4">
-                    <label class="form-label">Branches</label>
-                    <p class="text-muted small">Choose one or more branches, or select all branches.</p>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input select-all-checkbox" type="checkbox" id="allBranches" data-group="branch-checkbox">
-                        <label class="form-check-label" for="allBranches">All Branches</label>
-                    </div>
-                    <div class="d-flex flex-wrap gap-3">
-                        <% ["CSE", "CSE (AI & DS)", "MNC", "ECE", "EEE", "Mechanical", "Civil", "Chemical", "Biotechnology", "Metallurgical and Materials Engineering"].forEach((branch, index) => { %>
-                        <div class="form-check">
-                            <input class="form-check-input branch-checkbox" type="checkbox" id="branch<%= index %>" name="announcement[branches]" value="<%= branch %>">
-                            <label class="form-check-label" for="branch<%= index %>"><%= branch %></label>
-                        </div>
-                        <% }) %>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label">Years</label>
-                    <p class="text-muted small">Choose one or more years, or select all years.</p>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input select-all-checkbox" type="checkbox" id="allYears" data-group="year-checkbox">
-                        <label class="form-check-label" for="allYears">All Years</label>
-                    </div>
-                    <div class="d-flex flex-wrap gap-3">
-                        <% [{value: 1, label: "1st Year"}, {value: 2, label: "2nd Year"}, {value: 3, label: "3rd Year"}, {value: 4, label: "4th Year"}].forEach(year => { %>
-                            <div class="form-check">
-                                <input class="form-check-input year-checkbox" type="checkbox" id="year<%= year.value %>" name="announcement[years]" value="<%= year.value %>">
-                                <label class="form-check-label" for="year<%= year.value %>"><%= year.label %></label>
-                            </div>
-                        <% }) %>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label">Sections</label>
-                    <p class="text-muted small">Choose one or more sections, or select all sections.</p>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input select-all-checkbox" type="checkbox" id="allSections" data-group="section-checkbox">
-                        <label class="form-check-label" for="allSections">All Sections</label>
-                    </div>
-                    <div class="d-flex flex-wrap gap-3">
-                        <% ["A", "B", "C", "D"].forEach(section => { %>
-                            <div class="form-check">
-                                <input class="form-check-input section-checkbox" type="checkbox" id="section<%= section %>" name="announcement[sections]" value="<%= section %>">
-                                <label class="form-check-label" for="section<%= section %>">Section <%= section %></label>
-                            </div>
-                        <% }) %>
-                    </div>
-                </div>
-                <div id="studentAudienceError" class="text-danger small mb-3" hidden>Select at least one branch, year, and section, or select all for each category.</div>
-            </div>
-            <div class="mb-4">
-                <label for="priority" class="form-label">Priority</label>
-                <select id="priority" name="announcement[priority]" class="form-select" required>
-                    <option value="Normal" selected>Normal</option>
+
+
+            <div class="ann-form-group">
+                <label>Priority *</label>
+
+                <select name="announcement[priority]" required>
+                    <option value="Normal">Normal</option>
                     <option value="Important">Important</option>
                     <option value="Urgent">Urgent</option>
                 </select>
             </div>
-            <div class="announcement-form-actions">
-                <a href="/announcements" class="btn btn-light">Cancel</a>
-                <button type="submit" class="btn btn-announcement-submit">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Publish Announcement
-                </button>
+
+        </div>
+
+
+        <% if (allowedScopes.length > 1) { %>
+
+            <div class="ann-form-group">
+                <label>Publish To *</label>
+
+                <select name="announcement[scope]" id="announcementScope" required>
+
+                    <option value="">Choose publishing scope</option>
+
+                    <% allowedScopes.forEach(s => { %>
+                        <option value="<%= s.scope %>">
+                            <%= s.scope === "Class"
+                                ? "My Class (" + s.branch + " · Year " + s.year + " · " + s.section + ")"
+                                : s.scope === "Club"
+                                ? s.club
+                                : "College" %>
+                        </option>
+                    <% }) %>
+
+                </select>
             </div>
-        </form>
-    </div>
+
+        <% } else { %>
+
+            <input
+                type="hidden"
+                name="announcement[scope]"
+                value="<%= allowedScopes[0].scope %>"
+            >
+
+            <% if (allowedScopes[0].scope === "Class") { %>
+                <div class="ann-scope-info">
+                    <i class="fa-solid fa-users"></i>
+                    Publishing to your class:
+                    <strong>
+                        <%= allowedScopes[0].branch %> · Year <%= allowedScopes[0].year %> · <%= allowedScopes[0].section %>
+                    </strong>
+                </div>
+            <% } else if (allowedScopes[0].scope === "Club") { %>
+                <div class="ann-scope-info">
+                    <i class="fa-solid fa-people-group"></i>
+                    Publishing to:
+                    <strong><%= allowedScopes[0].club %></strong>
+                </div>
+            <% } else { %>
+                <div class="ann-scope-info">
+                    <i class="fa-solid fa-building-columns"></i>
+                    Publishing to the entire college.
+                </div>
+            <% } %>
+
+        <% } %>
+
+
+        <div class="ann-form-group">
+            <label>Attachment</label>
+
+            <label for="announcementAttachment" class="ann-upload-box">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <strong>Upload an image</strong>
+                <span>JPG, PNG or WEBP · Maximum 10 MB</span>
+                <input
+                    type="file"
+                    id="announcementAttachment"
+                    name="attachment"
+                    accept="image/png,image/jpeg,image/webp"
+                >
+            </label>
+
+            <div id="imagePreview" class="ann-image-preview"></div>
+        </div>
+
+
+        <div class="ann-form-actions">
+            <a href="/announcements" class="ann-btn ann-btn-light">
+                Cancel
+            </a>
+
+            <button type="submit" class="ann-btn ann-btn-primary">
+                <i class="fa-solid fa-paper-plane"></i>
+                Publish Announcement
+            </button>
+        </div>
+
+    </form>
+
 </div>
+
+
 <script src="/js/announcements.js"></script>

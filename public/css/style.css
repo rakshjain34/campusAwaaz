@@ -133,7 +133,9 @@ body.campus-layout {
     border-radius: 10px;
     color: var(--campus-text);
     text-decoration: none;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
 .sidebar-link i {
@@ -162,7 +164,9 @@ body.campus-layout {
     border-radius: 10px;
     color: var(--campus-text);
     text-decoration: none;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
 .sidebar-profile:hover {

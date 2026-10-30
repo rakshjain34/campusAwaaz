@@ -1,0 +1,249 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container py-5">
+
+    <!-- PROFILE HEADER -->
+    <div class="mb-4">
+        <h2 class="fw-bold">My Profile</h2>
+        <p class="text-muted">Manage your personal details and campus designations.</p>
+    </div>
+
+    <!-- PERSONAL INFORMATION -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:70px;height:70px;background:#648c80;color:white;font-size:28px;">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+                    <h4 class="fw-bold mb-1"><%= currUser.name %></h4>
+                    <p class="text-muted mb-0"><%= currUser.email %></p>
+
+                    <span class="badge mt-2" style="background:#648c80;">
+                        <%= currUser.accountType %>
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <% if (currUser.accountType === "Student") { %>
+
+        <!-- ACADEMIC DETAILS -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">
+                    <i class="fa-solid fa-graduation-cap me-2"></i>
+                    Academic Details
+                </h5>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <small class="text-muted">Roll Number</small>
+                        <p class="fw-semibold"><%= currUser.rollNo %></p>
+                    </div>
+
+                    <div class="col-md-4">
+                        <small class="text-muted">Branch</small>
+                        <p class="fw-semibold"><%= currUser.branch %></p>
+                    </div>
+
+                    <div class="col-md-4">
+                        <small class="text-muted">Year</small>
+                        <p class="fw-semibold"><%= currUser.year %></p>
+                    </div>
+
+                    <div class="col-md-4">
+                        <small class="text-muted">Section</small>
+                        <p class="fw-semibold"><%= currUser.section %></p>
+                    </div>
+
+                    <div class="col-md-4">
+                        <small class="text-muted">Hostel</small>
+                        <p class="fw-semibold"><%= currUser.hostel %></p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- CLUBS -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">
+                    <i class="fa-solid fa-users me-2"></i>
+                    My Clubs
+                </h5>
+
+                <% if (currUser.clubs.length) { %>
+
+                    <% currUser.clubs.forEach(club => { %>
+
+                        <span class="badge rounded-pill me-2 mb-2 p-2"
+                              style="background:#e6efeb;color:#42685e;">
+                            <%= club %>
+                        </span>
+
+                    <% }) %>
+
+                <% } else { %>
+
+                    <p class="text-muted">No clubs added.</p>
+
+                <% } %>
+
+            </div>
+        </div>
+
+    <% } %>
+
+    <!-- CAMPUS DESIGNATIONS -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+
+            <h5 class="fw-bold mb-3">
+                <i class="fa-solid fa-award me-2"></i>
+                Campus Designations
+            </h5>
+
+            <% if (roles.length) { %>
+
+                <% roles.forEach(role => { %>
+
+                    <div class="d-flex justify-content-between align-items-center border rounded-3 p-3 mb-3">
+
+                        <div>
+
+                            <span class="badge mb-2" style="background:#648c80;">
+                                <%= role.role %>
+                            </span>
+
+                            <p class="mb-0 fw-semibold">
+
+                                <% if (role.role === "CR") { %>
+
+                                    <%= role.branch %> - Year <%= role.year %>, Section <%= role.section %>
+
+                                <% } else { %>
+
+                                    <%= role.club %>
+
+                                <% } %>
+
+                            </p>
+
+                        </div>
+
+                        <form action="/user/profile/relinquish/<%= role._id %>"
+                              method="POST"
+                              onsubmit="return confirm('Are you sure you want to relinquish this designation?')">
+
+                            <button class="btn btn-outline-danger btn-sm">
+                                Relinquish
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                <% }) %>
+
+            <% } else { %>
+
+                <p class="text-muted">You currently hold no campus designations.</p>
+
+            <% } %>
+
+        </div>
+    </div>
+
+    <% if (currUser.accountType === "Student") { %>
+
+        <!-- REQUEST DESIGNATION -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">
+                    <i class="fa-solid fa-star me-2"></i>
+                    Request a Designation
+                </h5>
+
+                <!-- CR REQUEST -->
+                <div class="mb-4">
+
+                    <h6 class="fw-semibold">Class Representative (CR)</h6>
+
+                    <p class="text-muted small">
+                        Become the CR of your class.
+                    </p>
+
+                    <form action="/user/profile/request-cr" method="POST">
+
+                        <button class="btn text-white"
+                                style="background:#648c80;">
+                            Request CR
+                        </button>
+
+                    </form>
+
+                </div>
+
+                <hr>
+
+                <!-- GENSEC REQUEST -->
+                <div>
+
+                    <h6 class="fw-semibold">General Secretary (GenSec)</h6>
+
+                    <p class="text-muted small">
+                        Select a club to request its GenSec designation.
+                    </p>
+
+                    <% if (currUser.clubs.length) { %>
+
+                        <form action="/user/profile/request-gensec" method="POST">
+
+                            <select name="club" class="form-select mb-3" required>
+
+                                <option value="">Select a club</option>
+
+                                <% currUser.clubs.forEach(club => { %>
+
+                                    <option value="<%= club %>">
+                                        <%= club %>
+                                    </option>
+
+                                <% }) %>
+
+                            </select>
+
+                            <button class="btn text-white"
+                                    style="background:#648c80;">
+                                Request GenSec
+                            </button>
+
+                        </form>
+
+                    <% } else { %>
+
+                        <p class="text-muted">
+                            Join a club to request its GenSec designation.
+                        </p>
+
+                    <% } %>
+
+                </div>
+
+            </div>
+        </div>
+
+    <% } %>
+
+</div>

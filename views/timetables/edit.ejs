@@ -1,0 +1,144 @@
+<% layout("/layouts/boilerplate") -%>
+
+<link rel="stylesheet" href="/css/announcements.css">
+<link rel="stylesheet" href="/css/timetables.css">
+
+<div class="ann-form-page">
+
+    <a href="/timetables/<%= timetable._id %>" class="ann-back">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to resource
+    </a>
+
+    <div class="ann-form-heading">
+        <span class="ann-eyebrow">CAMPUS CENTRAL</span>
+        <h1>Edit Resource</h1>
+        <p>Update your uploaded document.</p>
+    </div>
+
+
+    <form
+        action="/timetables/<%= timetable._id %>?_method=PUT"
+        method="POST"
+        enctype="multipart/form-data"
+        class="ann-form"
+    >
+
+        <div class="ann-form-group">
+            <label>Title *</label>
+
+            <input
+                type="text"
+                name="timetable[title]"
+                value="<%= timetable.title %>"
+                maxlength="150"
+                required
+            >
+        </div>
+
+
+        <div class="ann-form-group">
+            <label>Description</label>
+
+            <textarea
+                name="timetable[description]"
+                rows="4"
+                maxlength="1000"
+            ><%= timetable.description %></textarea>
+        </div>
+
+
+        <div class="ann-form-group">
+            <label>Category *</label>
+
+            <select name="timetable[category]" required>
+
+                <% [
+                    "Mess Menu",
+                    "Class Timetable",
+                    "Academic Calendar",
+                    "Exam Schedule",
+                    "Holiday List",
+                    "Other"
+                ].forEach(c => { %>
+
+                    <option value="<%= c %>" <%= timetable.category === c ? "selected" : "" %>>
+                        <%= c %>
+                    </option>
+
+                <% }) %>
+
+            </select>
+        </div>
+
+
+        <div class="ann-scope-info">
+            <i class="fa-solid fa-lock"></i>
+            Publishing scope cannot be changed.
+        </div>
+
+
+        <div class="tt-current-file">
+
+            <strong>Current attachment</strong>
+
+            <% if (timetable.attachmentType === "image") { %>
+
+                <img src="<%= timetable.attachment %>" alt="Current resource">
+
+            <% } else { %>
+
+                <a href="<%= timetable.attachment %>" target="_blank">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    View current PDF
+                </a>
+
+            <% } %>
+
+        </div>
+
+
+        <div class="ann-form-group">
+
+            <label>Replace attachment (optional)</label>
+
+            <label for="ttAttachment" class="ann-upload-box">
+
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                <strong>Choose a new image or PDF</strong>
+
+                <span>JPG, PNG, WEBP or PDF · Maximum 10 MB</span>
+
+                <input
+                    type="file"
+                    id="ttAttachment"
+                    name="attachment"
+                    accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
+                >
+
+            </label>
+
+            <div id="ttFilePreview" class="tt-file-preview"></div>
+
+        </div>
+
+
+        <div class="ann-form-actions">
+
+            <a href="/timetables/<%= timetable._id %>" class="ann-btn ann-btn-light">
+                Cancel
+            </a>
+
+            <button type="submit" class="ann-btn ann-btn-primary">
+                Save Changes
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script src="/js/timetables.js"></script>

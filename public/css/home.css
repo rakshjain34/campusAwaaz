@@ -22,7 +22,7 @@ body {
     margin: 0;
     background: var(--background);
     color: var(--text);
-    font-family: "Inter", "Segoe UI", sans-serif;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 a {
@@ -64,8 +64,6 @@ button {
     display: flex;
     min-height: 100vh;
 }
-
-
 
 .sidebar {
     width: 270px;
@@ -117,7 +115,6 @@ button {
     color: var(--mint-dark);
 }
 
-
 .sidebar-menu {
     display: flex;
     flex-direction: column;
@@ -156,7 +153,6 @@ button {
     color: var(--mint-dark);
     font-weight: 650;
 }
-
 
 .sidebar-bottom {
     margin-top: auto;
@@ -204,14 +200,10 @@ button {
     padding: 0 5px;
 }
 
-
-
 .main-content {
     flex: 1;
     min-width: 0;
 }
-
-
 
 .topbar {
     height: 80px;
@@ -265,7 +257,6 @@ button {
     display: none;
 }
 
-
 .dashboard-content {
     padding: 30px 35px 45px;
 }
@@ -281,7 +272,6 @@ button {
 .right-sidebar {
     min-width: 0;
 }
-
 
 .welcome-section {
     margin-bottom: 24px;
@@ -310,8 +300,6 @@ button {
     margin: 0;
     line-height: 1.7;
 }
-
-
 
 .search-bar {
     height: 48px;
@@ -362,9 +350,6 @@ button {
     color: var(--mint-dark);
 }
 
-
-
-
 .quick-access {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -413,7 +398,6 @@ button {
     font-size: 17px;
 }
 
-
 .quick-card h6 {
     margin: 0 0 6px;
     font-size: 12px;
@@ -436,8 +420,6 @@ button {
     color: #8ca0b1;
     font-size: 11px;
 }
-
-
 
 .feed-container {
     padding: 16px;
@@ -496,8 +478,6 @@ button {
     outline: none;
 }
 
-
-
 .post-card {
     padding: 18px;
     margin-bottom: 15px;
@@ -541,7 +521,6 @@ button {
     font-size: 10px;
     font-weight: 650;
 }
-
 
 .post-author h5 {
     margin: 0 0 8px;
@@ -603,7 +582,6 @@ button {
     margin-right: 5px;
 }
 
-
 .right-sidebar {
     display: flex;
     flex-direction: column;
@@ -642,9 +620,6 @@ button {
     text-decoration: underline;
     text-underline-offset: 3px;
 }
-
-
-
 
 .event-card {
     display: flex;
@@ -689,7 +664,6 @@ button {
     line-height: 1.4;
 }
 
-
 .event-info {
     min-width: 0;
 }
@@ -718,8 +692,6 @@ button {
     margin-right: 5px;
     color: #8497a9;
 }
-
-
 
 .pulse-heading {
     justify-content: flex-start;
@@ -774,8 +746,6 @@ button {
     font-size: 15px;
 }
 
-
-
 .pulse-item > div:nth-child(2) {
     flex: 1;
 }
@@ -798,8 +768,6 @@ button {
     color: #91a3b4;
     font-size: 11px;
 }
-
-
 
 .community-cta {
     display: flex;
@@ -849,10 +817,7 @@ button {
     font-size: 11px;
 }
 
-
-
 @media (max-width: 1200px) {
-
     .sidebar {
         width: 230px;
         min-width: 230px;
@@ -874,12 +839,9 @@ button {
     .quick-card {
         min-height: 125px;
     }
-
 }
 
-
 @media (max-width: 900px) {
-
     .sidebar {
         width: 75px;
         min-width: 75px;
@@ -921,12 +883,9 @@ button {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         align-items: start;
     }
-
 }
 
-
 @media (max-width: 600px) {
-
     .sidebar {
         display: none;
     }
@@ -1016,5 +975,4 @@ button {
     .right-sidebar {
         grid-template-columns: 1fr;
     }
-
-} 
+}

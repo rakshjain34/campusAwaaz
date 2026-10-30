@@ -1,0 +1,134 @@
+<% layout("/layouts/boilerplate") -%>
+
+<link rel="stylesheet" href="/css/announcements.css">
+<link rel="stylesheet" href="/css/timetables.css">
+
+<div class="ann-show-page">
+
+    <a href="/timetables" class="ann-back">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to resources
+    </a>
+
+
+    <article class="ann-show-card">
+
+        <div class="tt-show-badges">
+            <span class="ann-category"><%= timetable.category %></span>
+
+            <span class="ann-scope">
+                <%= timetable.scope === "College"
+                    ? "College"
+                    : timetable.scope === "Class"
+                    ? timetable.branch + " · Year " + timetable.year + " · " + timetable.section
+                    : timetable.club %>
+            </span>
+        </div>
+
+
+        <h1><%= timetable.title %></h1>
+
+
+        <div class="ann-show-meta">
+
+            <span>
+                <i class="fa-solid fa-user"></i>
+                <%= timetable.uploadedBy?.name || "Unknown" %>
+            </span>
+
+            <span>
+                <i class="fa-regular fa-calendar"></i>
+                <%= new Date(timetable.createdAt).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                }) %>
+            </span>
+
+        </div>
+
+
+        <hr>
+
+
+        <% if (timetable.description) { %>
+
+            <div class="ann-show-description">
+                <%= timetable.description %>
+            </div>
+
+        <% } %>
+
+
+        <div class="tt-document-viewer">
+
+            <% if (timetable.attachmentType === "image") { %>
+
+                <a href="<%= timetable.attachment %>" target="_blank">
+                    <img
+                        src="<%= timetable.attachment %>"
+                        alt="<%= timetable.title %>"
+                    >
+                </a>
+
+            <% } else { %>
+
+                <div class="tt-pdf-box">
+
+                    <i class="fa-solid fa-file-pdf"></i>
+
+                    <h3>PDF Document</h3>
+
+                    <p>Open the document to view or download it.</p>
+
+                    <a
+                        href="<%= timetable.attachment %>"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="ann-btn ann-btn-primary"
+                    >
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        Open PDF
+                    </a>
+
+                </div>
+
+            <% } %>
+
+        </div>
+
+
+        <% if (
+            currUser &&
+            timetable.uploadedBy &&
+            timetable.uploadedBy._id.toString() === currUser._id.toString()
+        ) { %>
+
+            <div class="ann-show-actions">
+
+                <a
+                    href="/timetables/<%= timetable._id %>/edit"
+                    class="ann-btn ann-btn-primary"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                    Edit
+                </a>
+
+                <form
+                    action="/timetables/<%= timetable._id %>?_method=DELETE"
+                    method="POST"
+                    onsubmit="return confirm('Delete this resource?')"
+                >
+                    <button type="submit" class="ann-btn ann-btn-danger">
+                        <i class="fa-solid fa-trash"></i>
+                        Delete
+                    </button>
+                </form>
+
+            </div>
+
+        <% } %>
+
+    </article>
+
+</div>

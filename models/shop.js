@@ -1,33 +1,32 @@
-
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const shopSchema = new Schema({
     shopkeeper: {
         type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true
+        ref: 'User',
+        required: true,
     },
     shopName: {
         type: String,
-        required: true
+        required: true,
     },
     location: {
         type: String,
-        required: true
+        required: true,
     },
     timings: {
         type: String,
-        required: true
+        required: true,
     },
     description: {
         type: String,
-        required: true
+        required: true,
     },
     isOpen: {
         type: Boolean,
-        default: false
-    }
+        default: false,
+    },
 });
 
-module.exports = mongoose.model("Shop", shopSchema);
+module.exports = mongoose.model('Shop', shopSchema);
