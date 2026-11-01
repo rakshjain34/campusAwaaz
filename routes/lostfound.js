@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('../cloudConfig.js');
+const { cloudinary } = require('../cloudConfig.js');
 const wrapAsync = require('../utils/wrapAsync.js');
 const { isLoggedIn } = require('../middleware.js');
 const LostFound = require('../models/lostfound.js');

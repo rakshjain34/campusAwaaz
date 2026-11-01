@@ -1,5 +1,5 @@
 const LostFound = require('../models/lostfound.js');
-const cloudinary = require('../cloudConfig.js');
+const { cloudinary } = require('../cloudConfig.js');
 const fs = require('fs');
 const path = require('path');
 
