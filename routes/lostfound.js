@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../cloudConfig.js');
 const wrapAsync = require('../utils/wrapAsync.js');
 const { isLoggedIn } = require('../middleware.js');
 const LostFound = require('../models/lostfound.js');
@@ -9,21 +9,16 @@ const controller = require('../controllers/lostfounds.js');
 
 const router = express.Router();
 
-const uploadPath = path.join(__dirname, '..', 'public', 'uploads', 'lostfound');
-fs.mkdirSync(uploadPath, { recursive: true });
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname).toLowerCase();
-        cb(null, Date.now() + '-' + Math.round(Math.random() * 1e9) + ext);
-    },
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'campusawaaz/lostfound',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif']
+    }
 });
 
 const upload = multer({
-    storage,
+    storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         if (['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.mimetype)) {
@@ -31,7 +26,7 @@ const upload = multer({
         } else {
             cb(new Error('Only JPG, PNG, WEBP and GIF images are allowed.'));
         }
-    },
+    }
 });
 
 const itemOwner = async (req, res, next) => {

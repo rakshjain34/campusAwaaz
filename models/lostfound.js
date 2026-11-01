@@ -47,6 +47,10 @@ const lostFoundSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+        imageFilename: {
+            type: String,
+            default: '',
+        },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',

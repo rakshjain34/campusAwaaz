@@ -1,4 +1,3 @@
-
 <% layout("/layouts/boilerplate") -%>
 
 <div class="container py-4">
@@ -37,6 +36,12 @@
                 <p><strong>Branch:</strong> <%= item.createdBy.branch %></p>
             <% } %>
 
+            <% if (currUser && item.createdBy?.email && item.createdBy._id.toString() !== currUser._id.toString()) { %>
+                <a href="mailto:<%= item.createdBy.email %>?subject=Regarding%20your%20Lost%20and%20Found%20report" class="btn btn-primary mt-2">
+                    <i class="fa-solid fa-envelope"></i> Contact Owner
+                </a>
+            <% } %>
+
             <% if (currUser && item.createdBy && item.createdBy._id.toString() === currUser._id.toString()) { %>
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <a href="/lostfound/<%= item._id %>/edit" class="btn btn-outline-primary">Edit</a>
@@ -72,6 +77,12 @@
                             <h5 class="mt-2"><%= match.name %></h5>
                             <p class="text-muted"><%= match.category %> · <%= match.color %></p>
                             <a href="/lostfound/<%= match._id %>" class="btn btn-outline-primary">View Report</a>
+
+                            <% if (currUser && match.createdBy?.email && match.createdBy._id.toString() !== currUser._id.toString()) { %>
+                                <a href="mailto:<%= match.createdBy.email %>?subject=Regarding%20your%20Lost%20and%20Found%20report" class="btn btn-primary mt-2">
+                                    <i class="fa-solid fa-envelope"></i> Contact Owner
+                                </a>
+                            <% } %>
                         </div>
                     </div>
                 </div>

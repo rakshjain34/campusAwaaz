@@ -1,4 +1,5 @@
 const LostFound = require('../models/lostfound.js');
+const cloudinary = require('../cloudConfig.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -68,7 +69,8 @@ module.exports.create = async (req, res) => {
         specifications: data.specifications,
         location: data.location,
         date: data.date,
-        image: req.file ? '/uploads/lostfound/' + req.file.filename : '',
+        image: req.file ? req.file.path : '',
+        imageFilename: req.file ? req.file.filename : '',
         createdBy: req.user._id,
     });
 
@@ -99,7 +101,7 @@ module.exports.create = async (req, res) => {
 module.exports.show = async (req, res) => {
     const item = await LostFound.findById(req.params.id).populate(
         'createdBy',
-        'name branch accountType'
+        'name email branch accountType'
     );
 
     if (!item) {
@@ -115,7 +117,7 @@ module.exports.show = async (req, res) => {
         category: item.category,
         status: 'Active',
     })
-        .populate('createdBy', 'name branch accountType')
+        .populate('createdBy', 'name email branch accountType')
         .sort({ createdAt: -1 })
         .limit(5);
 
@@ -143,12 +145,15 @@ module.exports.update = async (req, res) => {
     item.status = data.status;
 
     if (req.file) {
-        if (item.image) {
+        if (item.imageFilename) {
+            await cloudinary.uploader.destroy(item.imageFilename);
+        } else if (item.image && item.image.startsWith('/uploads/')) {
             const oldPath = path.join(__dirname, '..', 'public', item.image);
             if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
         }
 
-        item.image = '/uploads/lostfound/' + req.file.filename;
+        item.image = req.file.path;
+        item.imageFilename = req.file.filename;
     }
 
     await item.save();
@@ -170,7 +175,9 @@ module.exports.resolve = async (req, res) => {
 module.exports.delete = async (req, res) => {
     const item = res.locals.item;
 
-    if (item.image) {
+    if (item.imageFilename) {
+        await cloudinary.uploader.destroy(item.imageFilename);
+    } else if (item.image && item.image.startsWith('/uploads/')) {
         const imagePath = path.join(__dirname, '..', 'public', item.image);
         if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
     }
