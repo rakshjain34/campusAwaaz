@@ -61,7 +61,7 @@ const canViewTimetable = (timetable, user) => {
 };
 
 const deleteCloudinaryFile = async (timetable) => {
-    if (!timetable.attachmentPublicId) return;
+    if (!timetable.attachmentPublicId || timetable.attachmentPublicId.startsWith('local:')) return;
 
     try {
         await cloudinary.uploader.destroy(timetable.attachmentPublicId, {

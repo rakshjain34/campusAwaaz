@@ -1,78 +1,78 @@
-
 <% layout("/layouts/boilerplate") -%>
 
-<div class="container mt-4">
-    <h2 class="mb-4">Campus Shops</h2>
+<link rel="stylesheet" href="/css/service.css">
 
-    <% if (currentUser && currentUser.accountType === "Shopkeeper") { %>
-        <a href="/services/new" class="btn btn-primary mb-4">
-            Add Shop Details
-        </a>
-    <% } %>
+<main class="services-page">
+    <header class="services-header">
+        <div>
+            <span class="services-eyebrow">CAMPUSAWAAZ · CAMPUS LIFE</span>
+            <h1>Campus Services</h1>
+            <p>Find campus shops, check their details, and see what is open.</p>
+        </div>
 
-    <% if (shops.length === 0) { %>
-        <p>No shops have been added yet.</p>
-    <% } %>
+        <% if (currentUser && currentUser.accountType === "Shopkeeper") { %>
+            <a href="/services/new" class="services-button">
+                <span aria-hidden="true">＋</span> Add shop details
+            </a>
+        <% } %>
+    </header>
 
-    <div class="row">
-        <% for (let shop of shops) { %>
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title"><%= shop.shopName %></h5>
+    <section class="services-section" aria-labelledby="shops-heading">
+        <div class="services-section-heading">
+            <div>
+                <span class="services-eyebrow">ON CAMPUS</span>
+                <h2 id="shops-heading">Campus shops</h2>
+            </div>
+            <span class="services-count"><%= shops.length %> <%= shops.length === 1 ? "shop" : "shops" %></span>
+        </div>
 
-                        <p>
-                            <strong>Location:</strong>
-                            <%= shop.location %>
-                        </p>
+        <% if (shops.length === 0) { %>
+            <div class="services-empty">
+                <div class="services-empty-icon" aria-hidden="true">⌂</div>
+                <h3>No shops listed yet</h3>
+                <p>Shop details will appear here once they are added.</p>
+            </div>
+        <% } else { %>
+            <div class="services-grid">
+                <% for (let shop of shops) { %>
+                    <article class="service-card">
+                        <div class="service-card-top">
+                            <div class="service-shop-icon" aria-hidden="true">⌂</div>
+                            <span class="service-status <%= shop.isOpen ? "is-open" : "is-closed" %>">
+                                <span class="service-status-dot"></span>
+                                <%= shop.isOpen ? "Open" : "Closed" %>
+                            </span>
+                        </div>
 
-                        <p>
-                            <strong>Usual Timings:</strong>
-                            <%= shop.timings %>
-                        </p>
+                        <h3><%= shop.shopName %></h3>
+                        <p class="service-description"><%= shop.description %></p>
 
-                        <p>
-                            <strong>Description:</strong>
-                            <%= shop.description %>
-                        </p>
+                        <dl class="service-details">
+                            <div>
+                                <dt>Location</dt>
+                                <dd><%= shop.location %></dd>
+                            </div>
+                            <div>
+                                <dt>Usual timings</dt>
+                                <dd><%= shop.timings %></dd>
+                            </div>
+                        </dl>
 
-                        <p>
-                            <strong>Status:</strong>
-                            <% if (shop.isOpen) { %>
-                                <span class="text-success">Open</span>
-                            <% } else { %>
-                                <span class="text-danger">Closed</span>
-                            <% } %>
-                        </p>
-
-                        <% if (currentUser &&
-                              currentUser.accountType === "Shopkeeper" &&
-                              shop.shopkeeper.equals(currentUser._id)) { %>
-
-                            <form action="/services/<%= shop._id %>/status"
-                                  method="POST">
-
-                                <select name="isOpen" class="form-select mb-2">
-                                    <option value="true"
-                                        <%= shop.isOpen ? "selected" : "" %>>
-                                        Open
-                                    </option>
-
-                                    <option value="false"
-                                        <%= !shop.isOpen ? "selected" : "" %>>
-                                        Closed
-                                    </option>
-                                </select>
-
-                                <button type="submit" class="btn btn-success">
-                                    Update Status
-                                </button>
+                        <% if (currentUser && currentUser.accountType === "Shopkeeper" && shop.shopkeeper.equals(currentUser._id)) { %>
+                            <form action="/services/<%= shop._id %>/status" method="POST" class="service-status-form">
+                                <label for="shop-status-<%= shop._id %>">Update availability</label>
+                                <div class="service-status-controls">
+                                    <select id="shop-status-<%= shop._id %>" name="isOpen">
+                                        <option value="true" <%= shop.isOpen ? "selected" : "" %>>Open</option>
+                                        <option value="false" <%= !shop.isOpen ? "selected" : "" %>>Closed</option>
+                                    </select>
+                                    <button type="submit" class="services-button services-button-small">Update</button>
+                                </div>
                             </form>
-
                         <% } %>
-                    </div>
-                </div>
+                    </article>
+                <% } %>
             </div>
         <% } %>
-    </div>
-</div>
+    </section>
+</main>

@@ -51,4 +51,20 @@ module.exports = {
             },
         },
     ],
+    timetables: [
+        {
+            title: 'II B.Tech CSE Section A Timetable 2026-27',
+            description: 'Second-year CSE Section A timetable, effective 20 July 2026.',
+            category: 'Class Timetable',
+            scope: 'Class',
+            publisherRole: 'CR',
+            branch: 'CSE',
+            year: 2,
+            section: 'A',
+            attachment: '/uploads/timetables/cse-2a-2026-27.jpg',
+            attachmentPublicId: 'local:cse-a-2-2026-27',
+            attachmentType: 'image',
+            uploadedByEmail: 'a@gmail.com',
+        },
+    ],
 };

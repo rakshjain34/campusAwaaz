@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user.js');
 const Shop = require('../models/shop.js');
 const RoleAssignment = require('../models/roles.js');
+const Timetable = require('../models/timetable.js');
 const data = require('./data.js');
 
 const shouldReset = process.argv.includes('--reset');
@@ -97,6 +98,27 @@ async function seed() {
     for (const student of data.students) await createAccount('Student', student);
     for (const staffMember of data.staff) await createAccount('Staff', staffMember);
     for (const shopkeeper of data.shopkeepers) await createAccount('Shopkeeper', shopkeeper);
+
+    for (const timetable of data.timetables || []) {
+        const uploader = await User.findOne({ email: timetable.uploadedByEmail });
+        if (!uploader) {
+            throw new Error(`Timetable uploader ${timetable.uploadedByEmail} was not seeded.`);
+        }
+
+        const { uploadedByEmail, ...timetableData } = timetable;
+        await Timetable.updateOne(
+            {
+                title: timetable.title,
+                scope: timetable.scope,
+                branch: timetable.branch,
+                year: timetable.year,
+                section: timetable.section,
+            },
+            { $setOnInsert: { ...timetableData, uploadedBy: uploader._id } },
+            { upsert: true },
+        );
+        console.log(`Seeded timetable: ${timetable.title} (uploaded by ${uploader.email})`);
+    }
 }
 
 seed()
