@@ -23,7 +23,6 @@ const LocalStartegy = require('passport-local');
 const User = require('./models/user.js');
 const users = require('./routes/user.js');
 const complaints = require('./routes/complaint.js');
-
 const lostfounds = require('./routes/lostfound.js');
 
 const Announcement = require('./models/announcement.js');
@@ -32,13 +31,15 @@ const LostFound = require('./models/lostfound.js');
 const announcements = require('./routes/announcement.js');
 const timetables = require('./routes/timetables.js');
 const adminRoutes = require('./routes/admin.js');
+
 const port = 8080;
+
 const sessionOptions = {
     secret: process.env.SESSION_SECRET || 'code',
     resave: false,
     saveUninitialized: true,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 3, //3days
+        maxAge: 1000 * 60 * 60 * 24 * 3,
         httpOnly: true,
     },
 };
@@ -79,19 +80,26 @@ app.use((req, res, next) => {
     next();
 });
 
-//announcements
+// Announcements
 app.use('/announcements', announcements);
-//complaints
+
+// Complaints
 app.use('/complaints', complaints);
-//lostfound
+
+// Lost and Found
 app.use('/lostfound', lostfounds);
-//timtetables
+
+// Timetables
 app.use('/timetables', timetables);
+
+// Admin
 app.use('/admin', adminRoutes);
+
 // Database Connection
 main()
     .then(() => console.log('Connection successful'))
     .catch((err) => console.log(err));
+
 async function main() {
     await mongoose.connect(process.env.ATLASDB_URL);
     console.log('Connected to MongoDB Atlas!');
@@ -102,12 +110,15 @@ app.get('/', (req, res) => {
     res.redirect('/campusAwaaz');
 });
 
-//Home Route
+// Home Route
 app.get('/campusAwaaz', async (req, res, next) => {
     try {
         const user = req.user;
         const validFeeds = ['for-you', 'trending', 'campus-life'];
-        const activeFeed = validFeeds.includes(req.query.feed) ? req.query.feed : 'for-you';
+        const activeFeed = validFeeds.includes(req.query.feed)
+            ? req.query.feed
+            : 'for-you';
+
         const now = new Date();
 
         const complaintVisibility =
@@ -118,11 +129,16 @@ app.get('/campusAwaaz', async (req, res, next) => {
                           ? [{ visibility: 'Public' }, { createdBy: user._id }]
                           : [{ visibility: 'Public' }],
                   };
+
         const currentComplaintFilter = {
-            $and: [{ status: { $ne: 'Done' } }, complaintVisibility],
+            $and: [
+                { status: { $ne: 'Done' } },
+                complaintVisibility,
+            ],
         };
 
         const announcementScopes = [{ scope: 'College' }];
+
         if (user?.accountType === 'Student') {
             announcementScopes.push({
                 scope: 'Class',
@@ -130,16 +146,31 @@ app.get('/campusAwaaz', async (req, res, next) => {
                 year: user.year,
                 section: user.section,
             });
+
             if (user.clubs?.length) {
-                announcementScopes.push({ scope: 'Club', club: { $in: user.clubs } });
+                announcementScopes.push({
+                    scope: 'Club',
+                    club: { $in: user.clubs },
+                });
             }
         }
-        const announcementVisibility = { $or: announcementScopes };
-        const announcementExpiry = {
-            $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }],
+
+        const announcementVisibility = {
+            $or: announcementScopes,
         };
+
+        const announcementExpiry = {
+            $or: [
+                { expiresAt: null },
+                { expiresAt: { $gt: now } },
+            ],
+        };
+
         const visibleAnnouncementFilter = {
-            $and: [announcementVisibility, announcementExpiry],
+            $and: [
+                announcementVisibility,
+                announcementExpiry,
+            ],
         };
 
         const currentComplaints = await Complaint.find(currentComplaintFilter)
@@ -155,11 +186,26 @@ app.get('/campusAwaaz', async (req, res, next) => {
                     'upvotes.5': { $exists: true },
                 },
             },
-            { $addFields: { upvoteCount: { $size: { $ifNull: ['$upvotes', []] } } } },
-            { $sort: { upvoteCount: -1, createdAt: -1 } },
+            {
+                $addFields: {
+                    upvoteCount: {
+                        $size: { $ifNull: ['$upvotes', []] },
+                    },
+                },
+            },
+            {
+                $sort: {
+                    upvoteCount: -1,
+                    createdAt: -1,
+                },
+            },
             { $limit: 5 },
         ]);
-        await Complaint.populate(trendingComplaints, { path: 'createdBy', select: 'name branch' });
+
+        await Complaint.populate(trendingComplaints, {
+            path: 'createdBy',
+            select: 'name branch',
+        });
 
         const campusAnnouncements = await Announcement.find(visibleAnnouncementFilter)
             .populate('postedBy', 'name accountType')
@@ -172,16 +218,26 @@ app.get('/campusAwaaz', async (req, res, next) => {
             month: '2-digit',
             day: '2-digit',
         }).formatToParts(now);
-        const campusDate = Object.fromEntries(campusDateParts.map(({ type, value }) => [type, value]));
-        const today = new Date(Date.UTC(
-            Number(campusDate.year),
-            Number(campusDate.month) - 1,
-            Number(campusDate.day)
-        ));
+
+        const campusDate = Object.fromEntries(
+            campusDateParts.map(({ type, value }) => [type, value])
+        );
+
+        const today = new Date(
+            Date.UTC(
+                Number(campusDate.year),
+                Number(campusDate.month) - 1,
+                Number(campusDate.day)
+            )
+        );
+
         const upcomingEvents = await Announcement.find({
             $and: [
                 visibleAnnouncementFilter,
-                { category: 'Events', eventDate: { $gte: today } },
+                {
+                    category: 'Events',
+                    eventDate: { $gte: today },
+                },
             ],
         })
             .populate('postedBy', 'name accountType')
@@ -190,11 +246,19 @@ app.get('/campusAwaaz', async (req, res, next) => {
 
         const weekAgo = new Date(now);
         weekAgo.setDate(weekAgo.getDate() - 7);
-        const [openComplaintCount, reunitedItemCount, newNoticeCount] = await Promise.all([
+
+        const [
+            openComplaintCount,
+            reunitedItemCount,
+            newNoticeCount,
+        ] = await Promise.all([
             Complaint.countDocuments(currentComplaintFilter),
             LostFound.countDocuments({ status: 'Resolved' }),
             Announcement.countDocuments({
-                $and: [visibleAnnouncementFilter, { createdAt: { $gte: weekAgo } }],
+                $and: [
+                    visibleAnnouncementFilter,
+                    { createdAt: { $gte: weekAgo } },
+                ],
             }),
         ]);
 
@@ -208,6 +272,7 @@ app.get('/campusAwaaz', async (req, res, next) => {
             reunitedItemCount,
             newNoticeCount,
         });
+
     } catch (error) {
         next(error);
     }
@@ -220,6 +285,7 @@ app.use('/user', users);
 const services = require('./routes/services.js');
 app.use('/services', services);
 
+// 404 Handler
 app.use((req, res, next) => {
     console.log('404 REQUEST:', req.method, req.originalUrl);
     next(new ExpressError(404, 'Page Not Found'));
@@ -228,13 +294,22 @@ app.use((req, res, next) => {
 // Error Handler
 app.use((err, req, res, next) => {
     console.error('ERROR:', err.stack || err);
+
     if (res.headersSent) {
         return next(err);
     }
-    res.status(err.statusCode || 500).send(err.message || 'Something went wrong!');
+
+    res.status(err.statusCode || 500).send(
+        err.message || 'Something went wrong!'
+    );
 });
+
 app.use((err, req, res, next) => {
-    let { statusCode = 500, message = 'Something went wrong!' } = err;
+    let {
+        statusCode = 500,
+        message = 'Something went wrong!',
+    } = err;
+
     res.status(statusCode).send(message);
 });
 

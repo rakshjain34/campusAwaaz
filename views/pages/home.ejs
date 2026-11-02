@@ -1,229 +1,631 @@
 <% layout("/layouts/boilerplate") %>
 
 <div class="campus-dashboard">
+
     <main class="main-content">
+
         <div class="dashboard-content">
+
             <div class="dashboard-grid">
+
+                <!-- ================= FEED SECTION ================= -->
+
                 <section class="feed-section">
+
+                    <!-- WELCOME -->
+
                     <div class="welcome-section">
-                        <span class="welcome-label">YOUR CAMPUS, YOUR COMMUNITY</span>
-                        <h1>Your campus, in the loop.</h1>
-                        <p>The updates, conversations, and help you need! All in one place.</p>
+
+                        <span class="welcome-label">
+                            YOUR CAMPUS, YOUR COMMUNITY
+                        </span>
+
+                        <h1>
+                            Your campus, in the loop.
+                        </h1>
+
+                        <p>
+                            The updates, conversations, and help you need!
+                            All in one place.
+                        </p>
+
                     </div>
 
-                    <form action="/search" method="GET" class="search-bar">
+                    <!-- SEARCH -->
+
+                    <form
+                        action="/search"
+                        method="GET"
+                        class="search-bar"
+                    >
+
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" name="q" placeholder="Search announcements, complaints, lost items...">
-                        <button type="submit" aria-label="Search">
+
+                        <input
+                            type="text"
+                            name="q"
+                            placeholder="Search announcements, complaints, lost items..."
+                            required
+                        >
+
+                        <button
+                            type="submit"
+                            aria-label="Search"
+                        >
                             <i class="fa-solid fa-arrow-right"></i>
                         </button>
+
                     </form>
 
+                    <!-- QUICK ACCESS -->
+
                     <div class="quick-access">
-                        <a href="/announcements" class="quick-card">
+
+                        <a
+                            href="/announcements"
+                            class="quick-card"
+                        >
+
                             <div class="quick-icon mint">
                                 <i class="fa-solid fa-bullhorn"></i>
                             </div>
+
                             <h6>Announcements</h6>
                             <p>Latest notices & events</p>
+
                             <i class="fa-solid fa-chevron-right card-arrow"></i>
+
                         </a>
 
-                        <a href="/complaints" class="quick-card">
+                        <a
+                            href="/complaints"
+                            class="quick-card"
+                        >
+
                             <div class="quick-icon peach">
                                 <i class="fa-regular fa-clipboard"></i>
                             </div>
+
                             <h6>Report an issue</h6>
                             <p>Submit a complaint</p>
+
                             <i class="fa-solid fa-chevron-right card-arrow"></i>
+
                         </a>
 
-                        <a href="/lostfound" class="quick-card">
+                        <a
+                            href="/lostfound"
+                            class="quick-card"
+                        >
+
                             <div class="quick-icon lavender">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </div>
+
                             <h6>Lost & Found</h6>
                             <p>Find or report lost items</p>
+
                             <i class="fa-solid fa-chevron-right card-arrow"></i>
+
                         </a>
 
-                        <a href="/services" class="quick-card">
+                        <a
+                            href="/services"
+                            class="quick-card"
+                        >
+
                             <div class="quick-icon blue">
                                 <i class="fa-regular fa-calendar-days"></i>
                             </div>
+
                             <h6>Campus Services</h6>
                             <p>Campus shops and services</p>
+
                             <i class="fa-solid fa-chevron-right card-arrow"></i>
+
                         </a>
+
                     </div>
 
+                    <!-- ================= FEED ================= -->
+
+                    <% if (currentUser) { %>
+
                     <div class="feed-container">
+
+                        <!-- FEED HEADER -->
+
                         <div class="feed-header">
+
                             <div class="feed-tabs">
-                                <a href="/campusAwaaz?feed=for-you" class="feed-tab <%= activeFeed === 'for-you' ? 'active' : '' %>">For you</a>
-                                <a href="/campusAwaaz?feed=trending" class="feed-tab <%= activeFeed === 'trending' ? 'active' : '' %>">Trending</a>
-                                <a href="/campusAwaaz?feed=campus-life" class="feed-tab <%= activeFeed === 'campus-life' ? 'active' : '' %>">Campus life</a>
+
+                                <a
+                                    href="/campusAwaaz?feed=for-you"
+                                    class="feed-tab <%= activeFeed === 'for-you' ? 'active' : '' %>"
+                                >
+                                    For you
+                                </a>
+
+                                <a
+                                    href="/campusAwaaz?feed=trending"
+                                    class="feed-tab <%= activeFeed === 'trending' ? 'active' : '' %>"
+                                >
+                                    Trending
+                                </a>
+
+                                <a
+                                    href="/campusAwaaz?feed=campus-life"
+                                    class="feed-tab <%= activeFeed === 'campus-life' ? 'active' : '' %>"
+                                >
+                                    Campus life
+                                </a>
+
                             </div>
+
                         </div>
 
                         <% if (activeFeed === 'for-you') { %>
+
                             <% if (currentComplaints.length) { %>
+
                                 <% currentComplaints.forEach(complaint => { %>
+
                                     <article class="post-card">
+
                                         <div class="post-heading">
-                                            <div class="post-icon peach"><i class="fa-regular fa-clipboard"></i></div>
-                                            <div class="post-author">
-                                                <span class="category-badge peach"><%= complaint.category %> · <%= complaint.subcategory %></span>
-                                                <h5><a href="/complaints/<%= complaint._id %>"><%= complaint.title %></a></h5>
-                                                <p><i class="fa-solid fa-user-graduate"></i> <%= complaint.createdBy?.name || 'Campus member' %><%= complaint.createdBy?.branch ? ' · ' + complaint.createdBy.branch : '' %></p>
+
+                                            <div class="post-icon peach">
+                                                <i class="fa-regular fa-clipboard"></i>
                                             </div>
-                                            <span class="post-time"><%= new Date(complaint.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) %></span>
+
+                                            <div class="post-author">
+
+                                                <span class="category-badge peach">
+                                                    <%= complaint.category %> · <%= complaint.subcategory %>
+                                                </span>
+
+                                                <h5>
+                                                    <a href="/complaints/<%= complaint._id %>">
+                                                        <%= complaint.title %>
+                                                    </a>
+                                                </h5>
+
+                                                <p>
+                                                    <i class="fa-solid fa-user-graduate"></i>
+                                                    <%= complaint.createdBy?.name || 'Campus member' %><%= complaint.createdBy?.branch ? ' · ' + complaint.createdBy.branch : '' %>
+                                                </p>
+
+                                            </div>
+
+                                            <span class="post-time">
+                                                <%= new Date(complaint.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) %>
+                                            </span>
+
                                         </div>
-                                        <p class="post-description"><%= complaint.description.length > 240 ? complaint.description.slice(0, 240) + '…' : complaint.description %></p>
+
+                                        <p class="post-description">
+                                            <%= complaint.description.length > 240 ? complaint.description.slice(0, 240) + '…' : complaint.description %>
+                                        </p>
+
                                         <div class="post-actions">
-                                            <a href="/complaints/<%= complaint._id %>"><i class="fa-regular fa-message"></i> View complaint</a>
-                                            <span><i class="fa-regular fa-thumbs-up"></i> <%= complaint.upvotes.length %> upvotes</span>
-                                            <span class="post-status"><%= complaint.status %></span>
+
+                                            <a href="/complaints/<%= complaint._id %>">
+                                                <i class="fa-regular fa-message"></i>
+                                                View complaint
+                                            </a>
+
+                                            <span>
+                                                <i class="fa-regular fa-thumbs-up"></i>
+                                                <%= complaint.upvotes.length %> upvotes
+                                            </span>
+
+                                            <span class="post-status">
+                                                <%= complaint.status %>
+                                            </span>
+
                                         </div>
+
                                     </article>
+
                                 <% }) %>
+
                             <% } else { %>
-                                <div class="post-empty-state">There are no current complaints to show.</div>
+
+                                <div class="post-empty-state">
+                                    There are no current complaints to show.
+                                </div>
+
                             <% } %>
+
                         <% } else if (activeFeed === 'trending') { %>
+
                             <% if (trendingComplaints.length) { %>
+
                                 <% trendingComplaints.forEach(complaint => { %>
+
                                     <article class="post-card">
+
                                         <div class="post-heading">
-                                            <div class="post-icon peach"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                                            <div class="post-author">
-                                                <span class="category-badge peach"><%= complaint.category %> · <%= complaint.subcategory %></span>
-                                                <h5><a href="/complaints/<%= complaint._id %>"><%= complaint.title %></a></h5>
-                                                <p><i class="fa-solid fa-user-graduate"></i> <%= complaint.createdBy?.name || 'Campus member' %><%= complaint.createdBy?.branch ? ' · ' + complaint.createdBy.branch : '' %></p>
+
+                                            <div class="post-icon peach">
+                                                <i class="fa-solid fa-arrow-trend-up"></i>
                                             </div>
-                                            <span class="post-time"><%= complaint.upvoteCount %> upvotes</span>
+
+                                            <div class="post-author">
+
+                                                <span class="category-badge peach">
+                                                    <%= complaint.category %> · <%= complaint.subcategory %>
+                                                </span>
+
+                                                <h5>
+                                                    <a href="/complaints/<%= complaint._id %>">
+                                                        <%= complaint.title %>
+                                                    </a>
+                                                </h5>
+
+                                                <p>
+                                                    <i class="fa-solid fa-user-graduate"></i>
+                                                    <%= complaint.createdBy?.name || 'Campus member' %><%= complaint.createdBy?.branch ? ' · ' + complaint.createdBy.branch : '' %>
+                                                </p>
+
+                                            </div>
+
+                                            <span class="post-time">
+                                                <%= complaint.upvoteCount %> upvotes
+                                            </span>
+
                                         </div>
-                                        <p class="post-description"><%= complaint.description.length > 240 ? complaint.description.slice(0, 240) + '…' : complaint.description %></p>
+
+                                        <p class="post-description">
+                                            <%= complaint.description.length > 240 ? complaint.description.slice(0, 240) + '…' : complaint.description %>
+                                        </p>
+
                                         <div class="post-actions">
-                                            <a href="/complaints/<%= complaint._id %>"><i class="fa-regular fa-message"></i> View complaint</a>
-                                            <span class="post-status"><%= complaint.status %></span>
+
+                                            <a href="/complaints/<%= complaint._id %>">
+                                                <i class="fa-regular fa-message"></i>
+                                                View complaint
+                                            </a>
+
+                                            <span class="post-status">
+                                                <%= complaint.status %>
+                                            </span>
+
                                         </div>
+
                                     </article>
+
                                 <% }) %>
+
                             <% } else { %>
-                                <div class="post-empty-state">No current complaints have more than five upvotes.</div>
+
+                                <div class="post-empty-state">
+                                    No current complaints have more than five upvotes.
+                                </div>
+
                             <% } %>
+
                         <% } else { %>
+
                             <% if (campusAnnouncements.length) { %>
+
                                 <% campusAnnouncements.forEach(announcement => { %>
+
                                     <article class="post-card">
+
                                         <div class="post-heading">
-                                            <div class="post-icon mint"><i class="fa-solid fa-bullhorn"></i></div>
-                                            <div class="post-author">
-                                                <span class="category-badge mint"><%= announcement.category %></span>
-                                                <h5><a href="/announcements/<%= announcement._id %>"><%= announcement.title %></a></h5>
-                                                <p><i class="fa-solid fa-user"></i> <%= announcement.postedBy?.name || 'Campus member' %></p>
+
+                                            <div class="post-icon mint">
+                                                <i class="fa-solid fa-bullhorn"></i>
                                             </div>
-                                            <span class="post-time"><%= new Date(announcement.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) %></span>
+
+                                            <div class="post-author">
+
+                                                <span class="category-badge mint">
+                                                    <%= announcement.category %>
+                                                </span>
+
+                                                <h5>
+                                                    <a href="/announcements/<%= announcement._id %>">
+                                                        <%= announcement.title %>
+                                                    </a>
+                                                </h5>
+
+                                                <p>
+                                                    <i class="fa-solid fa-user"></i>
+                                                    <%= announcement.postedBy?.name || 'Campus member' %>
+                                                </p>
+
+                                            </div>
+
+                                            <span class="post-time">
+                                                <%= new Date(announcement.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) %>
+                                            </span>
+
                                         </div>
-                                        <p class="post-description"><%= announcement.description.length > 240 ? announcement.description.slice(0, 240) + '…' : announcement.description %></p>
+
+                                        <p class="post-description">
+                                            <%= announcement.description.length > 240 ? announcement.description.slice(0, 240) + '…' : announcement.description %>
+                                        </p>
+
                                         <div class="post-actions">
-                                            <a href="/announcements/<%= announcement._id %>"><i class="fa-regular fa-file-lines"></i> View announcement</a>
-                                            <% if (announcement.scope === 'Class') { %><span><i class="fa-solid fa-users"></i> <%= announcement.branch %> · Year <%= announcement.year %> · <%= announcement.section %></span><% } %>
-                                            <% if (announcement.scope === 'Club') { %><span><i class="fa-solid fa-people-group"></i> <%= announcement.club %></span><% } %>
+
+                                            <a href="/announcements/<%= announcement._id %>">
+                                                <i class="fa-regular fa-file-lines"></i>
+                                                View announcement
+                                            </a>
+
+                                            <% if (announcement.scope === 'Class') { %>
+
+                                                <span>
+                                                    <i class="fa-solid fa-users"></i>
+                                                    <%= announcement.branch %> · Year <%= announcement.year %> · <%= announcement.section %>
+                                                </span>
+
+                                            <% } %>
+
+                                            <% if (announcement.scope === 'Club') { %>
+
+                                                <span>
+                                                    <i class="fa-solid fa-people-group"></i>
+                                                    <%= announcement.club %>
+                                                </span>
+
+                                            <% } %>
+
                                         </div>
+
                                     </article>
+
                                 <% }) %>
+
                             <% } else { %>
-                                <div class="post-empty-state">No announcements are available for you yet.</div>
+
+                                <div class="post-empty-state">
+                                    No announcements are available for you yet.
+                                </div>
+
                             <% } %>
+
                         <% } %>
+
                     </div>
+
+                    <% } else { %>
+
+                    <!-- LOGGED OUT MESSAGE -->
+
+                    <div class="empty-feed">
+
+                        <i class="fa-solid fa-users"></i>
+
+                        <h5>
+                            Your campus community awaits!
+                        </h5>
+
+                        <p>
+                            Log in to explore campus updates,
+                            trending complaints, and announcements.
+                        </p>
+
+                        <a href="/user/login" class="btn btn-success">
+                            Log in to CampusAwaaz
+                        </a>
+
+                    </div>
+
+                    <% } %>
+
                 </section>
 
+                <!-- ================= RIGHT SIDEBAR ================= -->
+
                 <aside class="right-sidebar">
+
+                    <!-- ================= CAMPUS EVENTS ================= -->
+
                     <section class="widget-card">
+
                         <div class="widget-heading">
-                            <h5>Coming up</h5>
-                            <a href="/announcements">View all</a>
+
+                            <h5>
+                                Campus events
+                            </h5>
+
+                            <a href="/announcements">
+                                View all
+                            </a>
+
                         </div>
 
                         <% if (upcomingEvents.length) { %>
+
                             <% upcomingEvents.forEach(event => { %>
-                                <a class="event-card" href="/announcements/<%= event._id %>">
+
+                                <a
+                                    class="event-card"
+                                    href="/announcements/<%= event._id %>"
+                                >
+
                                     <div class="event-date">
-                                        <span><%= new Date(event.eventDate).toLocaleDateString('en-IN', { month: 'short', timeZone: 'UTC' }).toUpperCase() %></span>
-                                        <strong><%= new Date(event.eventDate).toLocaleDateString('en-IN', { day: 'numeric', timeZone: 'UTC' }) %></strong>
+
+                                        <span>
+                                            <%= new Date(event.eventDate).toLocaleDateString('en-IN', { month: 'short', timeZone: 'UTC' }).toUpperCase() %>
+                                        </span>
+
+                                        <strong>
+                                            <%= new Date(event.eventDate).toLocaleDateString('en-IN', { day: 'numeric', timeZone: 'UTC' }) %>
+                                        </strong>
+
                                     </div>
+
                                     <div class="event-info">
-                                        <h6><%= event.title %></h6>
-                                        <p><i class="fa-regular fa-calendar"></i> <%= new Date(event.eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) %></p>
-                                        <% if (event.eventLocation) { %><p><i class="fa-solid fa-location-dot"></i> <%= event.eventLocation %></p><% } %>
+
+                                        <h6>
+                                            <%= event.title %>
+                                        </h6>
+
+                                        <p>
+                                            <i class="fa-regular fa-calendar"></i>
+                                            <%= new Date(event.eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) %>
+                                        </p>
+
+                                        <% if (event.eventLocation) { %>
+
+                                            <p>
+                                                <i class="fa-solid fa-location-dot"></i>
+                                                <%= event.eventLocation %>
+                                            </p>
+
+                                        <% } %>
+
                                     </div>
+
                                 </a>
+
                             <% }) %>
+
                         <% } else { %>
-                            <p class="empty-widget-message">No upcoming events have been announced.</p>
+
+                            <p class="empty-widget-message">
+                                No upcoming events have been announced.
+                            </p>
+
                         <% } %>
+
                     </section>
 
+                    <!-- ================= CAMPUS PULSE ================= -->
+
                     <section class="widget-card">
+
                         <div class="widget-heading pulse-heading">
+
                             <div class="pulse-icon">
                                 <i class="fa-solid fa-wave-square"></i>
                             </div>
+
                             <div>
-                                <h5>Campus pulse</h5>
-                                <p>What's happening around you</p>
+
+                                <h5>
+                                    Campus pulse
+                                </h5>
+
+                                <p>
+                                    What's happening around you
+                                </p>
+
                             </div>
+
                         </div>
 
+                        <!-- OPEN COMPLAINTS -->
+
                         <a href="/complaints" class="pulse-item">
+
                             <div class="pulse-item-icon peach">
                                 <i class="fa-solid fa-circle-exclamation"></i>
                             </div>
+
                             <div>
-                                <h4><%= openComplaintCount %></h4>
-                                <p>Open complaints</p>
+
+                                <h4>
+                                    <%= openComplaintCount %>
+                                </h4>
+
+                                <p>
+                                    Open complaints
+                                </p>
+
                             </div>
+
                             <i class="fa-solid fa-chevron-right"></i>
+
                         </a>
 
+                        <!-- REUNITED ITEMS -->
+
                         <a href="/lostfound" class="pulse-item">
+
                             <div class="pulse-item-icon lavender">
                                 <i class="fa-solid fa-check"></i>
                             </div>
+
                             <div>
-                                <h4><%= reunitedItemCount %></h4>
-                                <p>Items marked resolved</p>
+
+                                <h4>
+                                    <%= reunitedItemCount %>
+                                </h4>
+
+                                <p>
+                                    Items marked resolved
+                                </p>
+
                             </div>
+
                             <i class="fa-solid fa-chevron-right"></i>
+
                         </a>
 
+                        <!-- NEW NOTICES -->
+
                         <a href="/announcements" class="pulse-item">
+
                             <div class="pulse-item-icon mint">
                                 <i class="fa-solid fa-bullhorn"></i>
                             </div>
+
                             <div>
-                                <h4><%= newNoticeCount %></h4>
-                                <p>Notices this week</p>
+
+                                <h4>
+                                    <%= newNoticeCount %>
+                                </h4>
+
+                                <p>
+                                    Notices this week
+                                </p>
+
                             </div>
+
                             <i class="fa-solid fa-chevron-right"></i>
+
                         </a>
 
-                        <a href="/complaints/new" class="community-cta">
+                        <!-- COMMUNITY CTA -->
+
+                        <a
+                            href="/complaints/new"
+                            class="community-cta"
+                        >
+
                             <div class="community-icon">
                                 <i class="fa-solid fa-users"></i>
                             </div>
+
                             <div>
-                                <h6>Something on your mind?</h6>
-                                <p>Make your voice heard.</p>
+
+                                <h6>
+                                    Something on your mind?
+                                </h6>
+
+                                <p>
+                                    Make your voice heard.
+                                </p>
+
                             </div>
+
                             <i class="fa-solid fa-chevron-right"></i>
+
                         </a>
+
                     </section>
+
                 </aside>
+
             </div>
+
         </div>
+
     </main>
+
 </div>
