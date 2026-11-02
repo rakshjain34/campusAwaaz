@@ -14,7 +14,6 @@
         <p>Share important information with your campus community.</p>
     </div>
 
-
     <form
         action="/announcements"
         method="POST"
@@ -34,7 +33,6 @@
             >
         </div>
 
-
         <div class="ann-form-group">
             <label>Description *</label>
 
@@ -48,7 +46,6 @@
 
             <small>Maximum 5000 characters.</small>
         </div>
-
 
         <div class="ann-form-grid">
 
@@ -66,7 +63,6 @@
                 </select>
             </div>
 
-
             <div class="ann-form-group">
                 <label>Priority *</label>
 
@@ -80,93 +76,152 @@
         </div>
 
 
+        <!-- PUBLISHING DESTINATION -->
+
         <% if (allowedScopes.length > 1) { %>
 
             <div class="ann-form-group">
+
                 <label>Publish To *</label>
 
-                <select name="announcement[scope]" id="announcementScope" required>
+                <select
+                    name="announcement[scopeIndex]"
+                    id="announcementScope"
+                    required
+                >
 
-                    <option value="">Choose publishing scope</option>
+                    <option value="">Choose publishing destination</option>
 
-                    <% allowedScopes.forEach(s => { %>
-                        <option value="<%= s.scope %>">
+                    <% allowedScopes.forEach((s, index) => { %>
+
+                        <option value="<%= index %>">
+
                             <%= s.scope === "Class"
                                 ? "My Class (" + s.branch + " · Year " + s.year + " · " + s.section + ")"
                                 : s.scope === "Club"
                                 ? s.club
-                                : "College" %>
+                                : "Entire College"
+                            %>
+
                         </option>
+
                     <% }) %>
 
                 </select>
+
             </div>
 
         <% } else { %>
 
             <input
                 type="hidden"
-                name="announcement[scope]"
-                value="<%= allowedScopes[0].scope %>"
+                name="announcement[scopeIndex]"
+                value="0"
             >
 
             <% if (allowedScopes[0].scope === "Class") { %>
+
                 <div class="ann-scope-info">
+
                     <i class="fa-solid fa-users"></i>
+
                     Publishing to your class:
+
                     <strong>
-                        <%= allowedScopes[0].branch %> · Year <%= allowedScopes[0].year %> · <%= allowedScopes[0].section %>
+                        <%= allowedScopes[0].branch %>
+                        · Year <%= allowedScopes[0].year %>
+                        · <%= allowedScopes[0].section %>
                     </strong>
+
                 </div>
+
             <% } else if (allowedScopes[0].scope === "Club") { %>
+
                 <div class="ann-scope-info">
+
                     <i class="fa-solid fa-people-group"></i>
+
                     Publishing to:
+
                     <strong><%= allowedScopes[0].club %></strong>
+
                 </div>
+
             <% } else { %>
+
                 <div class="ann-scope-info">
+
                     <i class="fa-solid fa-building-columns"></i>
+
                     Publishing to the entire college.
+
                 </div>
+
             <% } %>
 
         <% } %>
 
 
+        <!-- ATTACHMENT -->
+
         <div class="ann-form-group">
+
             <label>Attachment</label>
 
-            <label for="announcementAttachment" class="ann-upload-box">
+            <label
+                for="announcementAttachment"
+                class="ann-upload-box"
+            >
+
                 <i class="fa-solid fa-cloud-arrow-up"></i>
+
                 <strong>Upload an image</strong>
+
                 <span>JPG, PNG or WEBP · Maximum 10 MB</span>
+
                 <input
                     type="file"
                     id="announcementAttachment"
                     name="attachment"
                     accept="image/png,image/jpeg,image/webp"
                 >
+
             </label>
 
-            <div id="imagePreview" class="ann-image-preview"></div>
+            <div
+                id="imagePreview"
+                class="ann-image-preview"
+            ></div>
+
         </div>
 
 
+        <!-- ACTIONS -->
+
         <div class="ann-form-actions">
-            <a href="/announcements" class="ann-btn ann-btn-light">
+
+            <a
+                href="/announcements"
+                class="ann-btn ann-btn-light"
+            >
                 Cancel
             </a>
 
-            <button type="submit" class="ann-btn ann-btn-primary">
+            <button
+                type="submit"
+                class="ann-btn ann-btn-primary"
+            >
+
                 <i class="fa-solid fa-paper-plane"></i>
+
                 Publish Announcement
+
             </button>
+
         </div>
 
     </form>
 
 </div>
-
 
 <script src="/js/announcements.js"></script>

@@ -2,21 +2,44 @@ const Announcement = require('../models/announcement.js');
 const RoleAssignment = require('../models/roles.js');
 const { cloudinary } = require('../cloudConfig.js');
 const Timetable = require('../models/timetable.js');
+
+// GET VALID ROLE ASSIGNMENTS
 const getAssignments = async (userId) => {
-    return await RoleAssignment.find({ user: userId });
+    return await RoleAssignment.find({
+        user: userId,
+    });
 };
 
+// GET ALL SCOPES USER IS ALLOWED TO PUBLISH TO
 const getAllowedScopes = async (user) => {
+    // STAFF
     if (user.accountType === 'Staff') {
-        return [{ scope: 'College', publisherRole: 'Staff' }];
+        return [
+            {
+                scope: 'College',
+                publisherRole: 'Staff',
+            },
+        ];
+    }
+
+    if (user.accountType !== 'Student') {
+        return [];
     }
 
     const roles = await getAssignments(user._id);
 
     const scopes = [];
 
-    roles.forEach((role) => {
-        if (role.role === 'CR') {
+    let hasGenSec = false;
+
+    for (const role of roles) {
+        // CR: only their own class
+        if (
+            role.role === 'CR' &&
+            role.branch === user.branch &&
+            Number(role.year) === Number(user.year) &&
+            role.section === user.section
+        ) {
             scopes.push({
                 scope: 'Class',
                 publisherRole: 'CR',
@@ -26,26 +49,39 @@ const getAllowedScopes = async (user) => {
             });
         }
 
-        if (role.role === 'GenSec') {
+        // GenSec: only clubs they belong to
+        if (role.role === 'GenSec' && role.club && (user.clubs || []).includes(role.club)) {
+            if (!hasGenSec) {
+                scopes.push({
+                    scope: 'College',
+                    publisherRole: 'GenSec',
+                });
+
+                hasGenSec = true;
+            }
+
             scopes.push({
                 scope: 'Club',
                 publisherRole: 'GenSec',
                 club: role.club,
             });
         }
-    });
+    }
 
     return scopes;
 };
 
+// CHECK WHETHER USER CAN VIEW AN ANNOUNCEMENT
 const canViewAnnouncement = (announcement, user) => {
-    if (announcement.scope === 'College') return true;
+    if (announcement.scope === 'College') {
+        return true;
+    }
 
     if (announcement.scope === 'Class') {
         return (
             user.accountType === 'Student' &&
             user.branch === announcement.branch &&
-            Number(user.year) === announcement.year &&
+            Number(user.year) === Number(announcement.year) &&
             user.section === announcement.section
         );
     }
@@ -57,16 +93,19 @@ const canViewAnnouncement = (announcement, user) => {
     return false;
 };
 
+// EXPIRY FILTER
 const getExpiryFilter = () => ({
     $or: [{ expiresAt: null }, { expiresAt: { $gt: new Date() } }],
 });
 
+// ATTACHMENT TYPE
 const getUploadType = (file) => {
     if (!file) return '';
 
     return file.mimetype === 'application/pdf' ? 'file' : 'image';
 };
 
+// DELETE OLD CLOUDINARY FILE
 const deleteCloudinaryFile = async (announcement) => {
     if (!announcement.attachmentPublicId) return;
 
@@ -79,7 +118,10 @@ const deleteCloudinaryFile = async (announcement) => {
     }
 };
 
+// ==========================================
 // INDEX
+// ==========================================
+
 module.exports.index = async (req, res) => {
     const user = req.user;
 
@@ -111,7 +153,9 @@ module.exports.index = async (req, res) => {
     };
 
     if (scope === 'College') {
-        query.$and.push({ scope: 'College' });
+        query.$and.push({
+            scope: 'College',
+        });
     }
 
     if (scope === 'Class') {
@@ -126,27 +170,49 @@ module.exports.index = async (req, res) => {
     if (scope === 'Club') {
         query.$and.push({
             scope: 'Club',
-            club: { $in: user.clubs || [] },
+            club: {
+                $in: user.clubs || [],
+            },
         });
     }
 
-    if (category) query.$and.push({ category });
-    if (priority) query.$and.push({ priority });
+    if (category) {
+        query.$and.push({ category });
+    }
+
+    if (priority) {
+        query.$and.push({ priority });
+    }
 
     if (search.trim()) {
         query.$and.push({
             $or: [
-                { title: { $regex: search.trim(), $options: 'i' } },
-                { description: { $regex: search.trim(), $options: 'i' } },
+                {
+                    title: {
+                        $regex: search.trim(),
+                        $options: 'i',
+                    },
+                },
+                {
+                    description: {
+                        $regex: search.trim(),
+                        $options: 'i',
+                    },
+                },
             ],
         });
     }
 
     const announcements = await Announcement.find(query)
         .populate('postedBy', 'name accountType')
-        .sort({ isPinned: -1, createdAt: -1 });
+        .sort({
+            isPinned: -1,
+            createdAt: -1,
+        });
 
     const allowedScopes = await getAllowedScopes(user);
+
+    // TIMETABLE VISIBILITY
     const timetableConditions = [{ scope: 'College' }];
 
     if (user.accountType === 'Student') {
@@ -160,7 +226,9 @@ module.exports.index = async (req, res) => {
         if (user.clubs && user.clubs.length) {
             timetableConditions.push({
                 scope: 'Club',
-                club: { $in: user.clubs },
+                club: {
+                    $in: user.clubs,
+                },
             });
         }
     }
@@ -171,16 +239,24 @@ module.exports.index = async (req, res) => {
         .populate('uploadedBy', 'name')
         .sort({ createdAt: -1 })
         .limit(4);
+
     res.render('announcements/index.ejs', {
         announcements,
         allowedScopes,
         activeScope: scope,
-        filters: { category, priority, search },
+        filters: {
+            category,
+            priority,
+            search,
+        },
         timetables,
     });
 };
 
+// ==========================================
 // MY ANNOUNCEMENTS
+// ==========================================
+
 module.exports.mine = async (req, res) => {
     const announcements = await Announcement.find({
         postedBy: req.user._id,
@@ -188,81 +264,101 @@ module.exports.mine = async (req, res) => {
         .populate('postedBy', 'name')
         .sort({ createdAt: -1 });
 
-    res.render('announcements/mine.ejs', { announcements });
+    res.render('announcements/mine.ejs', {
+        announcements,
+    });
 };
 
+// ==========================================
 // NEW FORM
+// ==========================================
+
 module.exports.renderNewForm = async (req, res) => {
     const allowedScopes = await getAllowedScopes(req.user);
 
     if (!allowedScopes.length) {
         req.flash('error', 'You are not authorized to publish announcements.');
+
         return res.redirect('/announcements');
     }
 
-    res.render('announcements/new.ejs', { allowedScopes });
+    res.render('announcements/new.ejs', {
+        allowedScopes,
+    });
 };
 
-// CREATE
+// ==========================================
+// CREATE ANNOUNCEMENT
+// ==========================================
+
 module.exports.create = async (req, res) => {
     const allowedScopes = await getAllowedScopes(req.user);
 
-    const { title, description, category, priority, scope, club } = req.body.announcement;
+    const announcementData = req.body.announcement;
 
-    let selectedScope;
-
-    if (req.user.accountType === 'Staff') {
-        selectedScope = allowedScopes.find((s) => s.scope === 'College');
-    } else {
-        selectedScope = allowedScopes.find((s) => {
-            if (s.scope !== scope) return false;
-
-            if (scope === 'Club') return s.club === club;
-
-            return true;
-        });
+    if (!announcementData) {
+        req.flash('error', 'Invalid announcement details.');
+        return res.redirect('/announcements/new');
     }
 
-    if (!selectedScope) {
+    const { title, description, category, priority, scopeIndex } = announcementData;
+
+    // Validate selected scope index
+    const index = Number(scopeIndex);
+
+    if (!Number.isInteger(index) || index < 0 || index >= allowedScopes.length) {
         req.flash('error', 'You are not authorized to publish in this section.');
+
         return res.redirect('/announcements');
     }
 
-    const announcementData = {
+    // Get the actual permitted scope from the server
+    const selectedScope = allowedScopes[index];
+
+    const newAnnouncement = {
         title,
         description,
         category,
         priority,
+
         scope: selectedScope.scope,
         publisherRole: selectedScope.publisherRole,
+
         postedBy: req.user._id,
     };
 
+    // CLASS ANNOUNCEMENT
     if (selectedScope.scope === 'Class') {
-        announcementData.branch = selectedScope.branch;
-        announcementData.year = selectedScope.year;
-        announcementData.section = selectedScope.section;
+        newAnnouncement.branch = selectedScope.branch;
+        newAnnouncement.year = selectedScope.year;
+        newAnnouncement.section = selectedScope.section;
     }
 
+    // CLUB ANNOUNCEMENT
     if (selectedScope.scope === 'Club') {
-        announcementData.club = selectedScope.club;
+        newAnnouncement.club = selectedScope.club;
     }
 
+    // ATTACHMENT
     if (req.file) {
-        announcementData.attachment = req.file.path;
-        announcementData.attachmentPublicId = req.file.filename;
-        announcementData.attachmentType = getUploadType(req.file);
+        newAnnouncement.attachment = req.file.path;
+        newAnnouncement.attachmentPublicId = req.file.filename;
+        newAnnouncement.attachmentType = getUploadType(req.file);
     }
 
-    const announcement = new Announcement(announcementData);
+    const announcement = new Announcement(newAnnouncement);
 
     await announcement.save();
 
     req.flash('success', 'Announcement published successfully!');
+
     res.redirect('/announcements');
 };
 
+// ==========================================
 // SHOW
+// ==========================================
+
 module.exports.show = async (req, res) => {
     const announcement = await Announcement.findById(req.params.id).populate(
         'postedBy',
@@ -279,17 +375,27 @@ module.exports.show = async (req, res) => {
         return res.redirect('/announcements');
     }
 
-    res.render('announcements/show.ejs', { announcement });
+    res.render('announcements/show.ejs', {
+        announcement,
+    });
 };
 
+// ==========================================
 // EDIT FORM
+// ==========================================
+
 module.exports.renderEditForm = async (req, res) => {
     const announcement = res.locals.announcement;
 
-    res.render('announcements/edit.ejs', { announcement });
+    res.render('announcements/edit.ejs', {
+        announcement,
+    });
 };
 
+// ==========================================
 // UPDATE
+// ==========================================
+
 module.exports.update = async (req, res) => {
     const announcement = res.locals.announcement;
 
@@ -311,16 +417,22 @@ module.exports.update = async (req, res) => {
     await announcement.save();
 
     req.flash('success', 'Announcement updated successfully!');
+
     res.redirect(`/announcements/${announcement._id}`);
 };
 
+// ==========================================
 // DELETE
+// ==========================================
+
 module.exports.delete = async (req, res) => {
     const announcement = res.locals.announcement;
 
     await deleteCloudinaryFile(announcement);
+
     await Announcement.findByIdAndDelete(announcement._id);
 
     req.flash('success', 'Announcement deleted successfully!');
+
     res.redirect('/announcements');
 };

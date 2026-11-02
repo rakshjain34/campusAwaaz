@@ -32,35 +32,55 @@ module.exports.canPublishAnnouncement = async (req, res, next) => {
 
         if (!user) {
             req.flash('error', 'Please log in first.');
+
             return res.redirect('/user/login');
         }
+
+        // Staff can publish college-wide announcements.
 
         if (user.accountType === 'Staff') {
             return next();
         }
 
+        // Only students can have CR or GenSec designations.
+
         if (user.accountType !== 'Student') {
             req.flash('error', 'You are not authorized to publish.');
+
             return res.redirect('/announcements');
         }
-
-        const RoleAssignment = require('./models/roles.js');
 
         const assignments = await RoleAssignment.find({
             user: user._id,
         });
 
-        if (!assignments.length) {
-            req.flash('error', 'Only Staff, CRs and General Secretaries can publish.');
-            return res.redirect('/announcements');
+        const hasValidCR = assignments.some(
+            (role) =>
+                role.role === 'CR' &&
+                role.branch === user.branch &&
+                Number(role.year) === Number(user.year) &&
+                role.section === user.section
+        );
+
+        const hasValidGenSec = assignments.some(
+            (role) => role.role === 'GenSec' && role.club && (user.clubs || []).includes(role.club)
+        );
+
+        if (hasValidCR || hasValidGenSec) {
+            return next();
         }
 
-        next();
+        req.flash(
+            'error',
+
+            'Only Staff, CRs and General Secretaries can publish.'
+        );
+
+        return res.redirect('/announcements');
     } catch (err) {
         next(err);
     }
 };
-
 module.exports.isAnnouncementAuthor = async (req, res, next) => {
     try {
         const announcement = await Announcement.findById(req.params.id);
