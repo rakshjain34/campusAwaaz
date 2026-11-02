@@ -1,29 +1,29 @@
 <aside class="sidebar">
         <div class="sidebar-menu">
-            <a href="/" class="sidebar-link active">
+            <a href="/" class="sidebar-link <%= currentPath === '/' || currentPath === '/campusAwaaz' ? 'active' : '' %>">
                 <i class="fa-solid fa-house"></i>
                 <span>Home</span>
             </a>
-            <a href="/announcements" class="sidebar-link">
+            <a href="/announcements" class="sidebar-link <%= currentPath.startsWith('/announcements') ? 'active' : '' %>">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Announcements</span>
             </a>
-            <a href="/complaints" class="sidebar-link">
+            <a href="/complaints" class="sidebar-link <%= currentPath === '/complaints/notifications' ? '' : currentPath.startsWith('/complaints') ? 'active' : '' %>">
                 <i class="fa-regular fa-clipboard"></i>
                 <span>Complaints</span>
             </a>
                 <% if (typeof currUser !== "undefined" && currUser && currUser.accountType === "Staff") { %>
-            <a href="/complaints/notifications" class="sidebar-link">
+            <a href="/complaints/notifications" class="sidebar-link <%= currentPath === '/complaints/notifications' ? 'active' : '' %>">
                 <i class="fa-regular fa-bell"></i>
                 <span>Notifications</span>
             </a>
                 <% } %>
-            <a href="/lostfound" class="sidebar-link">
+            <a href="/lostfound" class="sidebar-link <%= currentPath.startsWith('/lostfound') ? 'active' : '' %>">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <span>Lost & Found</span>
             </a>
 
-            <a href="/services" class="sidebar-link">
+            <a href="/services" class="sidebar-link <%= currentPath.startsWith('/services') ? 'active' : '' %>">
                 <i class="fa-regular fa-calendar-days"></i>
                 <span>Campus Services</span>
             </a>
