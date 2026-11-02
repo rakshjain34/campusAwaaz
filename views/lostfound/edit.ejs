@@ -1,11 +1,18 @@
 
 <% layout("/layouts/boilerplate") -%>
 
-<div class="container py-4" style="max-width: 800px;">
-    <a href="/lostfound/<%= item._id %>" class="text-decoration-none">← Back to report</a>
-    <h1 class="mt-3">Edit Report</h1>
+<link rel="stylesheet" href="/css/lostfound.css">
 
-    <form action="/lostfound/<%= item._id %>?_method=PUT" method="POST" enctype="multipart/form-data" class="card card-body gap-3">
+<main class="lf-page lf-form-page">
+<div class="lf-form-content">
+    <a href="/lostfound/<%= item._id %>" class="text-decoration-none lf-back">← Back to report</a>
+    <header class="lf-form-heading">
+        <span class="lf-eyebrow">CAMPUSAWAAZ · YOUR REPORT</span>
+        <h1>Edit report</h1>
+        <p>Update the details so people see the latest information.</p>
+    </header>
+
+    <form action="/lostfound/<%= item._id %>?_method=PUT" method="POST" enctype="multipart/form-data" class="card card-body gap-3 lf-form-card">
         <div>
             <label class="form-label">Item Name</label>
             <input class="form-control" name="lostfound[name]" value="<%= item.name %>" maxlength="100" required>
@@ -61,7 +68,7 @@
         <% if (item.image) { %>
             <div>
                 <p class="form-label">Current Image</p>
-                <img src="<%= item.image %>" alt="Current item image" style="max-width:220px; max-height:180px; object-fit:cover;">
+                <img src="<%= item.image %>" alt="Current item image" class="lf-current-image">
             </div>
         <% } %>
 
@@ -71,6 +78,7 @@
             <small class="text-muted">Maximum size: 5 MB</small>
         </div>
 
-        <button class="btn btn-primary" type="submit">Save Changes</button>
+        <button class="btn btn-primary lf-button" type="submit">Save Changes</button>
     </form>
 </div>
+</main>
