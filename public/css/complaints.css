@@ -458,44 +458,44 @@
         flex-direction: column;
     }
 }
-/* Lavender is the primary complaints-panel color */
+/* Warm accent is the primary complaints-panel color */
 .complaints-eyebrow,
 .complaints-back,
 .complaint-card h3 a:hover,
 .complaint-card-actions a,
 .complaint-delete-link {
-    color: #7667d8;
+    color: #d78c69;
 }
 
 .complaint-button {
-    background: #7667d8;
+    background: #d78c69;
     color: #ffffff !important;
 }
 
 .complaint-button:hover {
-    background: #6556c5;
+    background: #bd7351;
 }
 
 .complaint-button-light {
-    background: #efedff;
-    color: #7667d8 !important;
+    background: #f8e9e2;
+    color: #d78c69 !important;
 }
 
 .complaint-button-light:hover {
-    background: #e3dfff;
+    background: #f1d8cc;
 }
 
 .complaint-tag.lavender,
 .complaint-tag.mint {
-    background: #efedff;
-    color: #7667d8;
+    background: #f8e9e2;
+    color: #d78c69;
 }
 
 .upvote-button,
 .upvote-count {
-    background: #efedff;
-    border-color: #d8d1ff;
-    color: #7667d8;
+    background: #f8e9e2;
+    border-color: #edcbbb;
+    color: #d78c69;
 }
 
 .complaint-form input:focus,
@@ -504,18 +504,18 @@
 .complaint-filters select:focus,
 .staff-tools select:focus,
 .staff-tools textarea:focus {
-    border-color: #7667d8;
-    box-shadow: 0 0 0 3px rgba(118, 103, 216, 0.14);
+    border-color: #d78c69;
+    box-shadow: 0 0 0 3px rgba(215, 140, 105, 0.14);
 }
 
 .trending-list li b {
-    color: #7667d8;
+    color: #d78c69;
 }
 
 .updates-list li {
-    border-left-color: #efedff;
+    border-left-color: #f8e9e2;
 }
 
 .updates-list li::before {
-    background: #7667d8;
+    background: #d78c69;
 }
