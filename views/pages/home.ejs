@@ -52,7 +52,7 @@
                                 <i class="fa-regular fa-calendar-days"></i>
                             </div>
                             <h6>Campus Services</h6>
-                            <p>EV, shops and more</p>
+                            <p>Campus shops and services</p>
                             <i class="fa-solid fa-chevron-right card-arrow"></i>
                         </a>
                     </div>
@@ -60,73 +60,84 @@
                     <div class="feed-container">
                         <div class="feed-header">
                             <div class="feed-tabs">
-                                <button class="feed-tab active" type="button">For you</button>
-                                <button class="feed-tab" type="button">Trending</button>
-                                <button class="feed-tab" type="button">Campus life</button>
+                                <a href="/campusAwaaz?feed=for-you" class="feed-tab <%= activeFeed === 'for-you' ? 'active' : '' %>">For you</a>
+                                <a href="/campusAwaaz?feed=trending" class="feed-tab <%= activeFeed === 'trending' ? 'active' : '' %>">Trending</a>
+                                <a href="/campusAwaaz?feed=campus-life" class="feed-tab <%= activeFeed === 'campus-life' ? 'active' : '' %>">Campus life</a>
                             </div>
-                            <select class="sort-select" aria-label="Sort posts">
-                                <option>Latest</option>
-                                <option>Oldest</option>
-                            </select>
                         </div>
 
-                        <article class="post-card">
-                            <div class="post-heading">
-                                <div class="post-icon peach">
-                                    <i class="fa-solid fa-wrench"></i>
-                                </div>
-                                <div class="post-author">
-                                    <span class="category-badge peach">Facilities</span>
-                                    <h5>Water supply maintenance — Block 3</h5>
-                                    <p>
-                                        <i class="fa-solid fa-building-columns"></i>
-                                        Campus Facilities
-                                    </p>
-                                </div>
-                                <span class="post-time">2 hours ago</span>
-                            </div>
-
-                            <p class="post-description">
-                                The water supply in Block 3 will be under maintenance tomorrow from 9 AM to 12 PM.
-                                Please plan accordingly.
-                            </p>
-
-                            <div class="post-actions">
-                                <button type="button">
-                                    <i class="fa-regular fa-square-plus"></i>
-                                    Upvote
-                                </button>
-                            </div>
-                        </article>
-
-                        <article class="post-card">
-                            <div class="post-heading">
-                                <div class="post-icon lavender">
-                                    <i class="fa-solid fa-headphones"></i>
-                                </div>
-                                <div class="post-author">
-                                    <span class="category-badge lavender">Lost & Found</span>
-                                    <h5>Lost: Black wireless earbuds</h5>
-                                    <p>
-                                        <i class="fa-solid fa-user-graduate"></i>
-                                        Aarav · CSE
-                                    </p>
-                                </div>
-                                <span class="post-time">5 hours ago</span>
-                            </div>
-
-                            <p class="post-description">
-                                I found a pair of black wireless earbuds near the library canteen today.
-                                If they belong to you, please contact me.
-                            </p>
-
-                            <div class="post-actions">
-                                <button type="button">
-                                    <i class="fa-regular fa-message"></i>
-                                    Contact
-                                </button>
-                            </div>
-                        </article>
+                        <% if (activeFeed === 'for-you') { %>
+                            <% if (currentComplaints.length) { %>
+                                <% currentComplaints.forEach(complaint => { %>
+                                    <article class="post-card">
+                                        <div class="post-heading">
+                                            <div class="post-icon peach"><i class="fa-regular fa-clipboard"></i></div>
+                                            <div class="post-author">
+                                                <span class="category-badge peach"><%= complaint.category %> · <%= complaint.subcategory %></span>
+                                                <h5><a href="/complaints/<%= complaint._id %>"><%= complaint.title %></a></h5>
+                                                <p><i class="fa-solid fa-user-graduate"></i> <%= complaint.createdBy?.name || 'Campus member' %><%= complaint.createdBy?.branch ? ' · ' + complaint.createdBy.branch : '' %></p>
+                                            </div>
+                                            <span class="post-time"><%= new Date(complaint.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) %></span>
+                                        </div>
+                                        <p class="post-description"><%= complaint.description.length > 240 ? complaint.description.slice(0, 240) + '…' : complaint.description %></p>
+                                        <div class="post-actions">
+                                            <a href="/complaints/<%= complaint._id %>"><i class="fa-regular fa-message"></i> View complaint</a>
+                                            <span><i class="fa-regular fa-thumbs-up"></i> <%= complaint.upvotes.length %> upvotes</span>
+                                            <span class="post-status"><%= complaint.status %></span>
+                                        </div>
+                                    </article>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="post-empty-state">There are no current complaints to show.</div>
+                            <% } %>
+                        <% } else if (activeFeed === 'trending') { %>
+                            <% if (trendingComplaints.length) { %>
+                                <% trendingComplaints.forEach(complaint => { %>
+                                    <article class="post-card">
+                                        <div class="post-heading">
+                                            <div class="post-icon peach"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                                            <div class="post-author">
+                                                <span class="category-badge peach"><%= complaint.category %> · <%= complaint.subcategory %></span>
+                                                <h5><a href="/complaints/<%= complaint._id %>"><%= complaint.title %></a></h5>
+                                                <p><i class="fa-solid fa-user-graduate"></i> <%= complaint.createdBy?.name || 'Campus member' %><%= complaint.createdBy?.branch ? ' · ' + complaint.createdBy.branch : '' %></p>
+                                            </div>
+                                            <span class="post-time"><%= complaint.upvoteCount %> upvotes</span>
+                                        </div>
+                                        <p class="post-description"><%= complaint.description.length > 240 ? complaint.description.slice(0, 240) + '…' : complaint.description %></p>
+                                        <div class="post-actions">
+                                            <a href="/complaints/<%= complaint._id %>"><i class="fa-regular fa-message"></i> View complaint</a>
+                                            <span class="post-status"><%= complaint.status %></span>
+                                        </div>
+                                    </article>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="post-empty-state">No current complaints have more than five upvotes.</div>
+                            <% } %>
+                        <% } else { %>
+                            <% if (campusAnnouncements.length) { %>
+                                <% campusAnnouncements.forEach(announcement => { %>
+                                    <article class="post-card">
+                                        <div class="post-heading">
+                                            <div class="post-icon mint"><i class="fa-solid fa-bullhorn"></i></div>
+                                            <div class="post-author">
+                                                <span class="category-badge mint"><%= announcement.category %></span>
+                                                <h5><a href="/announcements/<%= announcement._id %>"><%= announcement.title %></a></h5>
+                                                <p><i class="fa-solid fa-user"></i> <%= announcement.postedBy?.name || 'Campus member' %></p>
+                                            </div>
+                                            <span class="post-time"><%= new Date(announcement.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) %></span>
+                                        </div>
+                                        <p class="post-description"><%= announcement.description.length > 240 ? announcement.description.slice(0, 240) + '…' : announcement.description %></p>
+                                        <div class="post-actions">
+                                            <a href="/announcements/<%= announcement._id %>"><i class="fa-regular fa-file-lines"></i> View announcement</a>
+                                            <% if (announcement.scope === 'Class') { %><span><i class="fa-solid fa-users"></i> <%= announcement.branch %> · Year <%= announcement.year %> · <%= announcement.section %></span><% } %>
+                                            <% if (announcement.scope === 'Club') { %><span><i class="fa-solid fa-people-group"></i> <%= announcement.club %></span><% } %>
+                                        </div>
+                                    </article>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="post-empty-state">No announcements are available for you yet.</div>
+                            <% } %>
+                        <% } %>
                     </div>
                 </section>
 
@@ -137,41 +148,23 @@
                             <a href="/announcements">View all</a>
                         </div>
 
-                        <div class="event-card">
-                            <div class="event-date">
-                                <span>NOV</span>
-                                <strong>14</strong>
-                            </div>
-                            <div class="event-info">
-                                <h6>Tech Talk: Building for Impact</h6>
-                                <p>
-                                    <i class="fa-regular fa-clock"></i>
-                                    4:00 PM – 6:00 PM
-                                </p>
-                                <p>
-                                    <i class="fa-solid fa-location-dot"></i>
-                                    Lecture Theatre 2
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="event-card">
-                            <div class="event-date">
-                                <span>NOV</span>
-                                <strong>16</strong>
-                            </div>
-                            <div class="event-info">
-                                <h6>Open Mic Night</h6>
-                                <p>
-                                    <i class="fa-regular fa-clock"></i>
-                                    6:30 PM – 9:00 PM
-                                </p>
-                                <p>
-                                    <i class="fa-solid fa-location-dot"></i>
-                                    Cultural Centre
-                                </p>
-                            </div>
-                        </div>
+                        <% if (upcomingEvents.length) { %>
+                            <% upcomingEvents.forEach(event => { %>
+                                <a class="event-card" href="/announcements/<%= event._id %>">
+                                    <div class="event-date">
+                                        <span><%= new Date(event.eventDate).toLocaleDateString('en-IN', { month: 'short', timeZone: 'UTC' }).toUpperCase() %></span>
+                                        <strong><%= new Date(event.eventDate).toLocaleDateString('en-IN', { day: 'numeric', timeZone: 'UTC' }) %></strong>
+                                    </div>
+                                    <div class="event-info">
+                                        <h6><%= event.title %></h6>
+                                        <p><i class="fa-regular fa-calendar"></i> <%= new Date(event.eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) %></p>
+                                        <% if (event.eventLocation) { %><p><i class="fa-solid fa-location-dot"></i> <%= event.eventLocation %></p><% } %>
+                                    </div>
+                                </a>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="empty-widget-message">No upcoming events have been announced.</p>
+                        <% } %>
                     </section>
 
                     <section class="widget-card">
@@ -190,7 +183,7 @@
                                 <i class="fa-solid fa-circle-exclamation"></i>
                             </div>
                             <div>
-                                <h4>12</h4>
+                                <h4><%= openComplaintCount %></h4>
                                 <p>Open complaints</p>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
@@ -201,8 +194,8 @@
                                 <i class="fa-solid fa-check"></i>
                             </div>
                             <div>
-                                <h4>8</h4>
-                                <p>Items reunited</p>
+                                <h4><%= reunitedItemCount %></h4>
+                                <p>Items marked resolved</p>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
@@ -212,8 +205,8 @@
                                 <i class="fa-solid fa-bullhorn"></i>
                             </div>
                             <div>
-                                <h4>5</h4>
-                                <p>New notices</p>
+                                <h4><%= newNoticeCount %></h4>
+                                <p>Notices this week</p>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>

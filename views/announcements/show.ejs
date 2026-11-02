@@ -62,6 +62,23 @@
 
         </div>
 
+        <% if (announcement.category === "Events" && announcement.eventDate) { %>
+            <div class="ann-show-meta">
+                <span>
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <%= new Date(announcement.eventDate).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                        timeZone: "UTC"
+                    }) %>
+                </span>
+                <% if (announcement.eventLocation) { %>
+                    <span><i class="fa-solid fa-location-dot"></i> <%= announcement.eventLocation %></span>
+                <% } %>
+            </div>
+        <% } %>
+
 
         <hr>
 

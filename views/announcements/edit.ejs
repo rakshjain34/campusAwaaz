@@ -52,7 +52,7 @@
             <div class="ann-form-group">
                 <label>Category</label>
 
-                <select name="announcement[category]">
+                <select name="announcement[category]" id="announcementCategory">
                     <% ["General", "Academic", "Events", "Clubs", "Hostel", "Placement", "Examinations"].forEach(c => { %>
                         <option value="<%= c %>" <%= announcement.category === c ? "selected" : "" %>>
                             <%= c %>
@@ -74,6 +74,29 @@
                 </select>
             </div>
 
+        </div>
+
+        <div id="eventFields" class="ann-event-fields" <%= announcement.category === "Events" ? "" : "hidden" %>>
+            <div class="ann-form-group">
+                <label>Event date *</label>
+                <input
+                    type="date"
+                    name="announcement[eventDate]"
+                    id="eventDate"
+                    value="<%= announcement.eventDate ? new Date(announcement.eventDate).toISOString().slice(0, 10) : '' %>"
+                >
+                <small>Events with a future date appear in Coming up on Home.</small>
+            </div>
+            <div class="ann-form-group">
+                <label>Location</label>
+                <input
+                    type="text"
+                    name="announcement[eventLocation]"
+                    maxlength="200"
+                    value="<%= announcement.eventLocation || '' %>"
+                    placeholder="Event venue"
+                >
+            </div>
         </div>
 
 

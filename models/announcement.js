@@ -74,6 +74,21 @@ const announcementSchema = new mongoose.Schema(
             default: 'Normal',
         },
 
+        eventDate: {
+            type: Date,
+            required: function () {
+                return this.category === 'Events';
+            },
+            default: null,
+        },
+
+        eventLocation: {
+            type: String,
+            trim: true,
+            maxlength: 200,
+            default: '',
+        },
+
         attachment: {
             type: String,
             default: '',

@@ -449,6 +449,16 @@
     gap: 18px;
 }
 
+.ann-event-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.ann-event-fields[hidden] {
+    display: none !important;
+}
+
 .ann-scope-info {
     background: #edf5f0;
     color: #466c5d;
@@ -656,6 +666,11 @@
     }
 
     .ann-form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .ann-event-fields {
         grid-template-columns: 1fr;
         gap: 0;
     }

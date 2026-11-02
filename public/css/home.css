@@ -446,6 +446,7 @@ button {
 }
 
 .feed-tab {
+    display: inline-block;
     padding: 0 0 13px;
 
     border: none;
@@ -456,6 +457,8 @@ button {
 
     font-size: 12px;
     font-weight: 550;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .feed-tab.active {
@@ -530,6 +533,15 @@ button {
     line-height: 1.5;
 }
 
+.post-author h5 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.post-author h5 a:hover {
+    color: var(--mint-dark);
+}
+
 .post-author p {
     margin: 0;
 
@@ -564,7 +576,8 @@ button {
     border-top: 1px solid var(--border);
 }
 
-.post-actions button {
+.post-actions button,
+.post-actions a {
     padding: 0;
 
     border: none;
@@ -572,10 +585,29 @@ button {
 
     color: #7c8fa2;
     font-size: 11px;
+    text-decoration: none;
 }
 
-.post-actions button:hover {
+.post-actions button:hover,
+.post-actions a:hover {
     color: var(--mint-dark);
+}
+
+.post-actions span {
+    color: #7c8fa2;
+    font-size: 11px;
+}
+
+.post-status {
+    margin-left: auto;
+}
+
+.post-empty-state,
+.empty-widget-message {
+    padding: 22px 16px;
+    color: var(--text-light);
+    font-size: 12px;
+    text-align: center;
 }
 
 .post-actions i {
@@ -631,6 +663,15 @@ button {
 
     border: 1px solid var(--border);
     border-radius: 11px;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.event-card:hover {
+    border-color: #b9e7da;
+    background: #fbfdfc;
+    color: inherit;
 }
 
 .event-card:last-child {
@@ -968,7 +1009,9 @@ button {
         flex-wrap: wrap;
     }
 
-    .post-actions button {
+    .post-actions button,
+    .post-actions a,
+    .post-actions span {
         font-size: 10px;
     }
 

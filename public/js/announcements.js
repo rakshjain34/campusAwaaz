@@ -1,5 +1,19 @@
 const attachmentInput = document.getElementById('announcementAttachment');
 const imagePreview = document.getElementById('imagePreview');
+const announcementCategory = document.getElementById('announcementCategory');
+const eventFields = document.getElementById('eventFields');
+const eventDate = document.getElementById('eventDate');
+
+if (announcementCategory && eventFields && eventDate) {
+    const updateEventFields = () => {
+        const isEvent = announcementCategory.value === 'Events';
+        eventFields.hidden = !isEvent;
+        eventDate.required = isEvent;
+    };
+
+    announcementCategory.addEventListener('change', updateEventFields);
+    updateEventFields();
+}
 
 if (attachmentInput && imagePreview) {
     attachmentInput.addEventListener('change', function () {

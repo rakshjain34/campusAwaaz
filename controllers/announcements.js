@@ -301,7 +301,13 @@ module.exports.create = async (req, res) => {
         return res.redirect('/announcements/new');
     }
 
-    const { title, description, category, priority, scopeIndex } = announcementData;
+    const { title, description, category, priority, scopeIndex, eventDate, eventLocation } = announcementData;
+
+    const parsedEventDate = eventDate ? new Date(eventDate) : null;
+    if (category === 'Events' && (!parsedEventDate || Number.isNaN(parsedEventDate.getTime()))) {
+        req.flash('error', 'Add a valid event date so it can appear in Coming up.');
+        return res.redirect('/announcements/new');
+    }
 
     // Validate selected scope index
     const index = Number(scopeIndex);
@@ -320,6 +326,8 @@ module.exports.create = async (req, res) => {
         description,
         category,
         priority,
+        eventDate: category === 'Events' ? parsedEventDate : null,
+        eventLocation: category === 'Events' ? (eventLocation || '').trim() : '',
 
         scope: selectedScope.scope,
         publisherRole: selectedScope.publisherRole,
@@ -399,12 +407,20 @@ module.exports.renderEditForm = async (req, res) => {
 module.exports.update = async (req, res) => {
     const announcement = res.locals.announcement;
 
-    const { title, description, category, priority } = req.body.announcement;
+    const { title, description, category, priority, eventDate, eventLocation } = req.body.announcement;
+
+    const parsedEventDate = eventDate ? new Date(eventDate) : null;
+    if (category === 'Events' && (!parsedEventDate || Number.isNaN(parsedEventDate.getTime()))) {
+        req.flash('error', 'Add a valid event date so it can appear in Coming up.');
+        return res.redirect(`/announcements/${announcement._id}/edit`);
+    }
 
     announcement.title = title;
     announcement.description = description;
     announcement.category = category;
     announcement.priority = priority;
+    announcement.eventDate = category === 'Events' ? parsedEventDate : null;
+    announcement.eventLocation = category === 'Events' ? (eventLocation || '').trim() : '';
 
     if (req.file) {
         await deleteCloudinaryFile(announcement);
