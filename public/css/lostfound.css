@@ -1,0 +1,240 @@
+
+.lostfound-page {
+    padding-top: 30px !important;
+    padding-bottom: 45px !important;
+}
+
+.lostfound-header h1 {
+    color: #172b3f;
+    font-weight: 700;
+    margin: 8px 0;
+}
+
+.lf-subtitle {
+    color: #7667d8;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.lostfound-header p {
+    font-size: 15px;
+}
+
+.lf-report-btn {
+    background-color: #efedff;
+    color: #7667d8;
+    border: 1px solid #efedff;
+    border-radius: 10px;
+    padding: 11px 18px;
+    font-weight: 600;
+}
+
+.lf-report-btn:hover {
+    background-color: #7667d8;
+    color: white;
+}
+
+.lf-myreports-btn {
+    background-color: white;
+    color: #526174;
+    border: 1px solid #e4eceb;
+    border-radius: 10px;
+    padding: 11px 18px;
+    font-weight: 600;
+}
+
+.lf-myreports-btn:hover {
+    background-color: #f8faf9;
+    color: #172b3f;
+}
+
+.lf-filter-card {
+    background: white;
+    border: 1px solid #e4eceb;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(28, 65, 61, 0.04);
+}
+
+.lf-search-box {
+    position: relative;
+}
+
+.lf-search-box i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7667d8;
+}
+
+.lf-search-box input {
+    padding-left: 40px;
+}
+
+.lf-filter-card .form-control,
+.lf-filter-card .form-select {
+    min-height: 43px;
+    border: 1px solid #e4eceb;
+    border-radius: 9px;
+}
+
+.lf-filter-card .form-control:focus,
+.lf-filter-card .form-select:focus {
+    border-color: #b9b0f5;
+    box-shadow: 0 0 0 3px rgba(118, 103, 216, 0.12);
+}
+
+.lf-search-btn {
+    background: #efedff;
+    color: #7667d8;
+    border: none;
+    border-radius: 9px;
+    min-height: 43px;
+    font-weight: 600;
+}
+
+.lf-search-btn:hover {
+    background: #7667d8;
+    color: white;
+}
+
+.lf-report-card {
+    border: 1px solid #e8ecef;
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 18px rgba(28, 65, 61, 0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.lf-report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 9px 25px rgba(28, 65, 61, 0.10);
+}
+
+.lf-item-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.lf-no-image {
+    height: 220px;
+    background: #f5f3ff;
+    color: #9185dc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.lf-no-image i {
+    font-size: 35px;
+}
+
+.lf-no-image span {
+    font-size: 13px;
+}
+
+.lf-report-card .card-body {
+    padding: 20px;
+}
+
+.lf-report-card .card-title {
+    color: #172b3f;
+    font-weight: 700;
+    font-size: 19px;
+}
+
+.lf-category {
+    color: #7667d8;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.lf-description {
+    color: #71849a;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.lf-item-info {
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+.lf-item-info p {
+    color: #71849a;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.lf-item-info i {
+    color: #7667d8;
+    width: 18px;
+}
+
+.lf-view-btn {
+    background: #efedff;
+    color: #7667d8;
+    border: none;
+    border-radius: 9px;
+    padding: 10px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.lf-view-btn:hover {
+    background: #7667d8;
+    color: white;
+}
+
+.lf-empty-state {
+    background: white;
+    border: 1px solid #e4eceb;
+    border-radius: 16px;
+    padding: 55px 20px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.lf-empty-icon {
+    width: 65px;
+    height: 65px;
+    background: #efedff;
+    color: #7667d8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 25px;
+}
+
+.lf-empty-state h4 {
+    color: #172b3f;
+    font-weight: 700;
+}
+
+.lf-empty-state p {
+    color: #71849a;
+    margin-bottom: 0;
+}
+
+@media (max-width: 576px) {
+    .lostfound-header h1 {
+        font-size: 26px;
+    }
+
+    .lf-filter-card {
+        padding: 15px;
+    }
+
+    .lostfound-header .btn {
+        font-size: 13px;
+        padding: 9px 12px;
+    }
+}

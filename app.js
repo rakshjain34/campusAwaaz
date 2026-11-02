@@ -6,6 +6,8 @@ if (process.env.NODE_ENV != 'production') {
     require('dotenv').config();
 }
 
+require('dns').setServers(['1.1.1.1', '1.0.0.1']);
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
