@@ -114,3 +114,13 @@ module.exports.isAnnouncementAuthor = async (req, res, next) => {
         next(err);
     }
 };
+
+module.exports.isStaff = (req, res, next) => {
+    if (req.user && req.user.accountType === 'Staff') {
+        return next();
+    }
+
+    req.flash('error', 'Only staff members can update EV location.');
+    return res.redirect('/services');
+};
+

@@ -1,8 +1,13 @@
+
 <% layout("/layouts/boilerplate") -%>
 
 <link rel="stylesheet" href="/css/service.css">
 
+<link rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
 <main class="services-page">
+
     <header class="services-header">
         <div>
             <span class="services-eyebrow">CAMPUSAWAAZ · CAMPUS LIFE</span>
@@ -17,62 +22,534 @@
         <% } %>
     </header>
 
+    <!-- CAMPUS SHOPS -->
+
     <section class="services-section" aria-labelledby="shops-heading">
+
         <div class="services-section-heading">
             <div>
                 <span class="services-eyebrow">ON CAMPUS</span>
                 <h2 id="shops-heading">Campus shops</h2>
             </div>
-            <span class="services-count"><%= shops.length %> <%= shops.length === 1 ? "shop" : "shops" %></span>
+
+            <span class="services-count">
+                <%= shops.length %>
+                <%= shops.length === 1 ? "shop" : "shops" %>
+            </span>
         </div>
 
         <% if (shops.length === 0) { %>
+
             <div class="services-empty">
                 <div class="services-empty-icon" aria-hidden="true">⌂</div>
                 <h3>No shops listed yet</h3>
                 <p>Shop details will appear here once they are added.</p>
             </div>
+
         <% } else { %>
+
             <div class="services-grid">
+
                 <% for (let shop of shops) { %>
+
                     <article class="service-card">
+
                         <div class="service-card-top">
+
                             <div class="service-shop-icon" aria-hidden="true">⌂</div>
-                            <span class="service-status <%= shop.isOpen ? "is-open" : "is-closed" %>">
+
+                            <span class="service-status <%= shop.isOpen ? 'is-open' : 'is-closed' %>">
                                 <span class="service-status-dot"></span>
                                 <%= shop.isOpen ? "Open" : "Closed" %>
                             </span>
+
                         </div>
 
                         <h3><%= shop.shopName %></h3>
-                        <p class="service-description"><%= shop.description %></p>
+
+                        <p class="service-description">
+                            <%= shop.description %>
+                        </p>
 
                         <dl class="service-details">
+
                             <div>
                                 <dt>Location</dt>
                                 <dd><%= shop.location %></dd>
                             </div>
+
                             <div>
                                 <dt>Usual timings</dt>
                                 <dd><%= shop.timings %></dd>
                             </div>
+
                         </dl>
 
-                        <% if (currentUser && currentUser.accountType === "Shopkeeper" && shop.shopkeeper.equals(currentUser._id)) { %>
-                            <form action="/services/<%= shop._id %>/status" method="POST" class="service-status-form">
-                                <label for="shop-status-<%= shop._id %>">Update availability</label>
+                        <% if (
+                            currentUser &&
+                            currentUser.accountType === "Shopkeeper" &&
+                            shop.shopkeeper.equals(currentUser._id)
+                        ) { %>
+
+                            <form
+                                action="/services/<%= shop._id %>/status"
+                                method="POST"
+                                class="service-status-form">
+
+                                <label for="shop-status-<%= shop._id %>">
+                                    Update availability
+                                </label>
+
                                 <div class="service-status-controls">
-                                    <select id="shop-status-<%= shop._id %>" name="isOpen">
-                                        <option value="true" <%= shop.isOpen ? "selected" : "" %>>Open</option>
-                                        <option value="false" <%= !shop.isOpen ? "selected" : "" %>>Closed</option>
+
+                                    <select
+                                        id="shop-status-<%= shop._id %>"
+                                        name="isOpen">
+
+                                        <option value="true" <%= shop.isOpen ? "selected" : "" %>>
+                                            Open
+                                        </option>
+
+                                        <option value="false" <%= !shop.isOpen ? "selected" : "" %>>
+                                            Closed
+                                        </option>
+
                                     </select>
-                                    <button type="submit" class="services-button services-button-small">Update</button>
+
+                                    <button type="submit"
+                                        class="services-button services-button-small">
+                                        Update
+                                    </button>
+
                                 </div>
                             </form>
+
                         <% } %>
+
                     </article>
+
                 <% } %>
+
             </div>
+
         <% } %>
+
     </section>
+
+
+    <!-- CAMPUS EV LIVE TRACKING -->
+
+    <section class="services-section" aria-labelledby="ev-heading">
+
+        <div class="services-section-heading">
+
+            <div>
+                <span class="services-eyebrow">LIVE TRACKING</span>
+                <h2 id="ev-heading">Campus EV</h2>
+            </div>
+
+            <span class="services-count">
+                <%= evs.length %>
+                <%= evs.length === 1 ? "vehicle" : "vehicles" %>
+            </span>
+
+        </div>
+
+
+        <% if (evs.length === 0) { %>
+
+            <div class="services-empty">
+                <h3>No EV added yet</h3>
+                <p>Vehicle tracking details will appear here.</p>
+            </div>
+
+        <% } else { %>
+
+            <div class="services-grid">
+
+                <% for (let ev of evs) { %>
+
+                    <article class="service-card ev-card"
+                        data-ev-id="<%= ev._id %>">
+
+                        <h3><%= ev.name %></h3>
+
+                        <p>
+                            Vehicle number: <%= ev.vehicleNumber %>
+                        </p>
+
+                        <p>
+                            Status:
+                            <strong class="ev-status">
+                                <%= ev.status %>
+                            </strong>
+                        </p>
+
+
+                        <!-- STAFF GPS CONTROLS -->
+
+                        <% if (currentUser && currentUser.accountType === "Staff") { %>
+
+                            <div class="ev-tracking-controls">
+
+                                <button type="button"
+                                    class="services-button ev-start-tracking">
+                                    Start Tracking
+                                </button>
+
+                                <button type="button"
+                                    class="services-button ev-stop-tracking"
+                                    disabled>
+                                    Stop Tracking
+                                </button>
+
+                            </div>
+
+                            <p class="ev-tracking-message">
+                                Tracking not started.
+                            </p>
+
+                        <% } %>
+
+
+                        <!-- MAP -->
+
+                        <div class="ev-map"
+                            id="ev-map-<%= ev._id %>"
+                            style="height: 300px; width: 100%; border-radius: 10px;">
+                        </div>
+
+                        <p class="ev-updated">
+                            Waiting for GPS location...
+                        </p>
+
+                    </article>
+
+                <% } %>
+
+            </div>
+
+        <% } %>
+
+    </section>
+
 </main>
+
+
+<!-- LEAFLET MAP LIBRARY -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+<script>
+
+document.querySelectorAll('.ev-card').forEach((card) => {
+
+    const evId = card.dataset.evId;
+
+    const mapElement = document.getElementById('ev-map-' + evId);
+
+
+    // INITIALIZE MAP
+
+    const map = L.map(mapElement).setView([20, 0], 2);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+
+    let marker = null;
+    let firstLocation = true;
+
+
+    // FETCH LATEST EV LOCATION
+
+    async function updateMap() {
+
+        try {
+
+            const response = await fetch('/services/ev/' + evId);
+
+            if (!response.ok) return;
+
+            const ev = await response.json();
+
+            card.querySelector('.ev-status').textContent = ev.status;
+
+
+            if (ev.latitude == null || ev.longitude == null) {
+                return;
+            }
+
+            const position = [ev.latitude, ev.longitude];
+
+
+            if (!marker) {
+
+                marker = L.marker(position).addTo(map);
+
+            } else {
+
+                marker.setLatLng(position);
+
+            }
+
+
+            if (firstLocation) {
+
+                map.setView(position, 17);
+                firstLocation = false;
+
+            }
+
+
+            card.querySelector('.ev-updated').textContent =
+                'Last updated: ' + new Date(ev.lastUpdated).toLocaleString();
+
+
+        } catch (error) {
+
+            console.log('Unable to get EV location:', error);
+
+        }
+
+    }
+
+
+    updateMap();
+
+    setInterval(updateMap, 5000);
+
+
+
+    // STAFF GPS TRACKING
+
+    const startButton = card.querySelector('.ev-start-tracking');
+    const stopButton = card.querySelector('.ev-stop-tracking');
+    const message = card.querySelector('.ev-tracking-message');
+
+
+    // These controls exist only for Staff accounts.
+
+    if (startButton && stopButton) {
+
+        let watchId = null;
+        let sendInterval = null;
+        let latestPosition = null;
+        let sending = false;
+
+
+        // SEND GPS LOCATION TO SERVER
+
+        async function sendLocation() {
+
+            if (!latestPosition || sending) return;
+
+            sending = true;
+
+            try {
+
+                const response = await fetch(
+                    '/services/ev/' + evId + '/location',
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+
+                        body: JSON.stringify({
+                            latitude: latestPosition.latitude,
+                            longitude: latestPosition.longitude
+                        })
+                    }
+                );
+
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Location update failed');
+                }
+
+                message.textContent = 'GPS location is being shared.';
+
+                updateMap();
+
+
+            } catch (error) {
+
+                message.textContent = error.message;
+
+                console.log('GPS update error:', error);
+
+            } finally {
+
+                sending = false;
+
+            }
+
+        }
+
+
+
+        // START TRACKING
+
+        startButton.addEventListener('click', () => {
+
+            if (!navigator.geolocation) {
+
+                message.textContent =
+                    'GPS is not supported by this browser.';
+
+                return;
+
+            }
+
+
+            if (watchId !== null) return;
+
+            startButton.disabled = true;
+
+            message.textContent = 'Requesting GPS permission...';
+
+
+            watchId = navigator.geolocation.watchPosition(
+
+                (position) => {
+
+                    latestPosition = {
+
+                        latitude: position.coords.latitude,
+
+                        longitude: position.coords.longitude
+
+                    };
+
+
+                    stopButton.disabled = false;
+
+                    message.textContent = 'GPS connected. Sending location...';
+
+
+                    // Send the first location immediately.
+
+                    sendLocation();
+
+
+                    // Send updated location every 5 seconds.
+
+                    if (sendInterval === null) {
+
+                        sendInterval = setInterval(sendLocation, 5000);
+
+                    }
+
+                },
+
+
+                (error) => {
+
+                    message.textContent = 'GPS error: ' + error.message;
+
+                    if (watchId !== null) {
+                        navigator.geolocation.clearWatch(watchId);
+                        watchId = null;
+                    }
+
+                    if (sendInterval !== null) {
+                        clearInterval(sendInterval);
+                        sendInterval = null;
+                    }
+
+                    latestPosition = null;
+
+                    startButton.disabled = false;
+                    stopButton.disabled = true;
+
+                },
+
+
+                {
+
+                    enableHighAccuracy: true,
+
+                    maximumAge: 0,
+
+                    timeout: 15000
+
+                }
+
+            );
+
+        });
+
+
+
+        // STOP TRACKING
+
+        stopButton.addEventListener('click', async () => {
+
+            if (watchId !== null) {
+
+                navigator.geolocation.clearWatch(watchId);
+
+                watchId = null;
+
+            }
+
+
+            if (sendInterval !== null) {
+
+                clearInterval(sendInterval);
+
+                sendInterval = null;
+
+            }
+
+
+            latestPosition = null;
+
+            stopButton.disabled = true;
+
+
+            try {
+
+                const response = await fetch(
+                    '/services/ev/' + evId + '/stop',
+                    {
+                        method: 'POST'
+                    }
+                );
+
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Could not stop tracking');
+                }
+
+
+                message.textContent = 'Tracking stopped.';
+
+                startButton.disabled = false;
+
+                updateMap();
+
+
+            } catch (error) {
+
+                message.textContent = error.message;
+
+                console.log('Stop tracking error:', error);
+
+            }
+
+        });
+
+    }
+
+});
+
+</script>
