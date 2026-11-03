@@ -4,7 +4,7 @@ const router = express.Router();
 const wrapAsync = require('../utils/wrapAsync.js');
 const controller = require('../controllers/announcements.js');
 
-const { isLoggedIn, canPublishAnnouncement, isAnnouncementAuthor } = require('../middleware.js');
+const { isLoggedIn, isAdmin, canPublishAnnouncement, isAnnouncementAuthor } = require('../middleware.js');
 
 const upload = require('../middleware/upload.js');
 
@@ -33,6 +33,8 @@ router.put(
 );
 
 router.delete('/:id', isLoggedIn, isAnnouncementAuthor, wrapAsync(controller.delete));
+
+router.post('/:id/pin', isLoggedIn, isAdmin, wrapAsync(controller.togglePin));
 
 router.get('/:id', isLoggedIn, wrapAsync(controller.show));
 

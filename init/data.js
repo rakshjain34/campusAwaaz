@@ -1,6 +1,13 @@
 // Fictional development accounts for local/demo use only.
 // Use fictional passwords here only; this file is part of the repository.
 module.exports = {
+    admins: [
+        {
+            name: 'Campus Administrator',
+            emailEnv: 'SEED_ADMIN_EMAIL',
+            passwordEnv: 'SEED_ADMIN_PASSWORD',
+        },
+    ],
     students: [
         {
             name:'a',

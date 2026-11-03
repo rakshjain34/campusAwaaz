@@ -20,6 +20,11 @@ router
     );
 
 router
+    .route('/admin/login')
+    .get(userController.renderAdminLogin)
+    .post(userController.adminLogin);
+
+router
     .route('/signup/staff')
     .get(userController.renderStaffSignup)
     .post(wrapAsync(userController.staffSignup));

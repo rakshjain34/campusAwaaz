@@ -13,11 +13,11 @@ const getAssignments = async (userId) => {
 // GET ALL SCOPES USER IS ALLOWED TO PUBLISH TO
 const getAllowedScopes = async (user) => {
     // STAFF
-    if (user.accountType === 'Staff') {
+    if (user.accountType === 'Staff' || user.accountType === 'Admin') {
         return [
             {
                 scope: 'College',
-                publisherRole: 'Staff',
+                publisherRole: user.accountType,
             },
         ];
     }
@@ -73,6 +73,8 @@ const getAllowedScopes = async (user) => {
 
 // CHECK WHETHER USER CAN VIEW AN ANNOUNCEMENT
 const canViewAnnouncement = (announcement, user) => {
+    if (user?.accountType === 'Admin') return true;
+
     if (announcement.scope === 'College') {
         return true;
     }
@@ -130,7 +132,10 @@ module.exports.index = async (req, res) => {
     const priority = req.query.priority || '';
     const search = req.query.search || '';
 
-    const visibilityConditions = [{ scope: 'College' }];
+    const visibilityConditions =
+        user.accountType === 'Admin'
+            ? [{ scope: { $in: ['College', 'Class', 'Club'] } }]
+            : [{ scope: 'College' }];
 
     if (user.accountType === 'Student') {
         visibilityConditions.push({
@@ -451,4 +456,17 @@ module.exports.delete = async (req, res) => {
     req.flash('success', 'Announcement deleted successfully!');
 
     res.redirect('/announcements');
+};
+
+module.exports.togglePin = async (req, res) => {
+    const announcement = await Announcement.findById(req.params.id);
+    if (!announcement) {
+        req.flash('error', 'Announcement not found.');
+        return res.redirect('/announcements');
+    }
+
+    announcement.isPinned = !announcement.isPinned;
+    await announcement.save();
+    req.flash('success', announcement.isPinned ? 'Announcement pinned.' : 'Announcement unpinned.');
+    res.redirect(req.get('Referrer') || '/announcements');
 };

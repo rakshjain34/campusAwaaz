@@ -285,6 +285,15 @@
                         Read more <i class="fa-solid fa-arrow-right"></i>
                     </a>
 
+                    <% if (currUser?.accountType === 'Admin') { %>
+                        <form action="/announcements/<%= announcement._id %>/pin" method="POST">
+                            <button class="ann-btn ann-btn-light" type="submit">
+                                <i class="fa-solid fa-thumbtack"></i>
+                                <%= announcement.isPinned ? 'Unpin' : 'Pin announcement' %>
+                            </button>
+                        </form>
+                    <% } %>
+
                 </div>
 
             </article>

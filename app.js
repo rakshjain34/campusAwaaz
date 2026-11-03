@@ -31,6 +31,7 @@ const Complaint = require('./models/complaint.js');
 const LostFound = require('./models/lostfound.js');
 const announcements = require('./routes/announcement.js');
 const timetables = require('./routes/timetables.js');
+const adminRoutes = require('./routes/admin.js');
 const port = 8080;
 const sessionOptions = {
     secret: process.env.SESSION_SECRET || 'code',
@@ -86,6 +87,7 @@ app.use('/complaints', complaints);
 app.use('/lostfound', lostfounds);
 //timtetables
 app.use('/timetables', timetables);
+app.use('/admin', adminRoutes);
 // Database Connection
 main()
     .then(() => console.log('Connection successful'))

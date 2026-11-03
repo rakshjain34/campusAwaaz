@@ -15,7 +15,7 @@ const userSchema = new Schema({
     },
     accountType: {
         type: String,
-        enum: ['Student', 'Staff', 'Shopkeeper'],
+        enum: ['Student', 'Staff', 'Shopkeeper', 'Admin'],
         required: true,
         default: 'Student',
     },
@@ -111,11 +111,6 @@ const userSchema = new Schema({
             return this.accountType === 'Student';
         },
     },
-    roleRequest: {
-        type: String,
-        enum: ['CR', 'GenSec', null],
-        default: null,
-    },
     verified: {
         type: Boolean,
         default: false,
@@ -125,5 +120,14 @@ const userSchema = new Schema({
 userSchema.plugin(passportLocalMongoose, {
     usernameField: 'username',
 });
+
+// The application supports exactly one administrator account.
+userSchema.index(
+    { accountType: 1 },
+    {
+        unique: true,
+        partialFilterExpression: { accountType: 'Admin' },
+    }
+);
 
 module.exports = mongoose.model('User', userSchema);

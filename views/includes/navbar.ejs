@@ -6,6 +6,9 @@
 
         <div class="d-flex align-items-center gap-3 ms-auto">
             <% if (typeof currUser !== "undefined" && currUser) { %>
+                <% if (currUser.accountType === "Admin") { %>
+                    <a href="/admin/role-requests" class="btn btn-sm btn-outline-success">Admin</a>
+                <% } %>
                 <a href="/notifications" class="notification-link" aria-label="Notifications">
                     <i class="fa-regular fa-bell"></i>
                 </a>

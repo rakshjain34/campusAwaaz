@@ -44,7 +44,7 @@ const announcementSchema = new mongoose.Schema(
 
         publisherRole: {
             type: String,
-            enum: ['Staff', 'CR', 'GenSec'],
+            enum: ['Staff', 'CR', 'GenSec', 'Admin'],
             required: true,
         },
 

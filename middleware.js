@@ -19,6 +19,15 @@ module.exports.isShopkeeper = (req, res, next) => {
     return res.redirect('/services');
 };
 
+module.exports.isAdmin = (req, res, next) => {
+    if (req.isAuthenticated() && req.user?.accountType === 'Admin') {
+        return next();
+    }
+
+    req.flash('error', 'Administrator access is required.');
+    return res.redirect(req.isAuthenticated() ? '/campusAwaaz' : '/user/admin/login');
+};
+
 module.exports.saveRedirectUrl = (req, res, next) => {
     if (req.session.redirectUrl) {
         res.locals.redirectUrl = req.session.redirectUrl;
@@ -38,7 +47,7 @@ module.exports.canPublishAnnouncement = async (req, res, next) => {
 
         // Staff can publish college-wide announcements.
 
-        if (user.accountType === 'Staff') {
+        if (user.accountType === 'Staff' || user.accountType === 'Admin') {
             return next();
         }
 

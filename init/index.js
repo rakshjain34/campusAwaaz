@@ -1,9 +1,11 @@
 require('dotenv').config();
+require('dns').setServers(['1.1.1.1', '1.0.0.1']);
 
 const mongoose = require('mongoose');
 const User = require('../models/user.js');
 const Shop = require('../models/shop.js');
 const RoleAssignment = require('../models/roles.js');
+const RoleRequest = require('../models/roleRequest.js');
 const Timetable = require('../models/timetable.js');
 const data = require('./data.js');
 
@@ -17,7 +19,7 @@ async function clearDatabase() {
     console.log(`Cleared data from ${collections.length} database collections.`);
 }
 
-async function assignStudentRoles(user, account) {
+async function seedStudentRoleRequests(user, account) {
     if (account.cr) {
         const classScope = {
             role: 'CR',
@@ -25,12 +27,13 @@ async function assignStudentRoles(user, account) {
             year: account.year,
             section: account.section.toUpperCase(),
         };
-        const currentCR = await RoleAssignment.findOne(classScope);
-        if (!currentCR) {
-            await RoleAssignment.create({ ...classScope, user: user._id });
-            console.log(`Assigned CR to ${account.email}`);
-        } else if (currentCR.user.toString() !== user._id.toString()) {
-            console.log(`Skipped CR for ${account.email}; this class already has a CR.`);
+        const [currentCR, pendingRequest] = await Promise.all([
+            RoleAssignment.findOne(classScope),
+            RoleRequest.findOne({ ...classScope, user: user._id, status: 'Pending' }),
+        ]);
+        if (!currentCR && !pendingRequest) {
+            await RoleRequest.create({ ...classScope, user: user._id });
+            console.log(`Created pending CR request for ${account.email}`);
         }
     }
 
@@ -38,20 +41,36 @@ async function assignStudentRoles(user, account) {
         if (!(account.clubs || []).includes(account.gensec)) {
             throw new Error(`${account.email} must belong to ${account.gensec} to be its GenSec.`);
         }
-        const currentGenSec = await RoleAssignment.findOne({ role: 'GenSec', club: account.gensec });
-        if (!currentGenSec) {
-            await RoleAssignment.create({ role: 'GenSec', club: account.gensec, user: user._id });
-            console.log(`Assigned GenSec for ${account.gensec} to ${account.email}`);
-        } else if (currentGenSec.user.toString() !== user._id.toString()) {
-            console.log(`Skipped GenSec for ${account.email}; ${account.gensec} already has a GenSec.`);
+        const [currentGenSec, pendingRequest] = await Promise.all([
+            RoleAssignment.findOne({ role: 'GenSec', club: account.gensec }),
+            RoleRequest.findOne({ role: 'GenSec', club: account.gensec, user: user._id, status: 'Pending' }),
+        ]);
+        if (!currentGenSec && !pendingRequest) {
+            await RoleRequest.create({ role: 'GenSec', club: account.gensec, user: user._id });
+            console.log(`Created pending GenSec request for ${account.email}`);
         }
     }
 }
 
 async function createAccount(accountType, account) {
-    const { shop, cr, gensec, password, ...profile } = account;
-    const existingUser = await User.findOne({ email: account.email });
+    const email = account.emailEnv ? process.env[account.emailEnv] : account.email;
+    const password = account.passwordEnv ? process.env[account.passwordEnv] : account.password;
+    if (!email || !password) {
+        throw new Error(`Set the email and password for the seeded ${accountType} account in .env.`);
+    }
+
+    const { shop, cr, gensec, password: _password, passwordEnv, emailEnv, ...profile } = account;
+    profile.email = email.trim().toLowerCase();
+    const existingUser = await User.findOne({ email: profile.email });
     if (existingUser) {
+        if (existingUser.accountType !== accountType) {
+            throw new Error(`${profile.email} already belongs to a ${existingUser.accountType} account.`);
+        }
+        if (accountType === 'Admin') {
+            await existingUser.setPassword(password);
+            await existingUser.save();
+            console.log(`Updated Admin password from seed settings: ${profile.email}`);
+        }
         if (accountType === 'Shopkeeper' && shop) {
             await Shop.updateOne(
                 { shopkeeper: existingUser._id },
@@ -59,8 +78,8 @@ async function createAccount(accountType, account) {
                 { upsert: true },
             );
         }
-        if (accountType === 'Student') await assignStudentRoles(existingUser, account);
-        console.log(`Skipped existing ${accountType} account: ${account.email}`);
+        if (accountType === 'Student') await seedStudentRoleRequests(existingUser, account);
+        console.log(`Skipped existing ${accountType} account: ${profile.email}`);
         return existingUser;
     }
 
@@ -69,17 +88,17 @@ async function createAccount(accountType, account) {
         username: profile.email,
         accountType,
         ...(accountType === 'Student'
-            ? { studentRole: cr ? 'CR' : 'Student', verified: false }
+            ? { studentRole: 'Student', verified: false }
             : {}),
     });
     const registeredUser = await User.register(user, password);
 
-    if (accountType === 'Student') await assignStudentRoles(registeredUser, account);
+    if (accountType === 'Student') await seedStudentRoleRequests(registeredUser, account);
     if (accountType === 'Shopkeeper' && shop) {
         await Shop.create({ ...shop, shopkeeper: registeredUser._id });
     }
 
-    console.log(`Created ${accountType} account: ${account.email}`);
+    console.log(`Created ${accountType} account: ${profile.email}`);
     return registeredUser;
 }
 
@@ -93,11 +112,22 @@ async function seed() {
         throw new Error(`Add a password to the seed data for ${missingPassword.email}.`);
     }
 
+    if ((data.admins || []).length !== 1) {
+        throw new Error('Configure exactly one administrator in init/data.js.');
+    }
+    const admin = data.admins[0];
+    const adminEmail = admin.emailEnv ? process.env[admin.emailEnv] : admin.email;
+    const adminPassword = admin.passwordEnv ? process.env[admin.passwordEnv] : admin.password;
+    if (!adminEmail || !adminPassword || adminPassword.length < 5) {
+        throw new Error('Set SEED_ADMIN_EMAIL and a SEED_ADMIN_PASSWORD of at least 5 characters in .env.');
+    }
+
     await mongoose.connect(process.env.ATLASDB_URL);
     if (shouldReset) await clearDatabase();
     for (const student of data.students) await createAccount('Student', student);
     for (const staffMember of data.staff) await createAccount('Staff', staffMember);
     for (const shopkeeper of data.shopkeepers) await createAccount('Shopkeeper', shopkeeper);
+    await createAccount('Admin', admin);
 
     for (const timetable of data.timetables || []) {
         const uploader = await User.findOne({ email: timetable.uploadedByEmail });

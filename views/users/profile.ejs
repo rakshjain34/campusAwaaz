@@ -31,6 +31,23 @@
         </div>
     </div>
 
+    <% if (pendingRequests.length) { %>
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3"><i class="fa-regular fa-clock me-2"></i>Requests waiting for approval</h5>
+                <% pendingRequests.forEach(request => { %>
+                    <p class="mb-2">
+                        <span class="badge text-bg-warning">Pending</span>
+                        <%= request.role === 'CR'
+                            ? 'CR · ' + request.branch + ' · Year ' + request.year + ' · Section ' + request.section
+                            : 'GenSec · ' + request.club %>
+                    </p>
+                <% }) %>
+                <p class="text-muted small mb-0">Your designation badge appears after the admin approves the request.</p>
+            </div>
+        </div>
+    <% } %>
+
     <% if (currUser.accountType === "Student") { %>
 
         <!-- ACADEMIC DETAILS -->
@@ -180,18 +197,17 @@
 
                     <h6 class="fw-semibold">Class Representative (CR)</h6>
 
-                    <p class="text-muted small">
-                        Become the CR of your class.
-                    </p>
+                    <p class="text-muted small">Ask the admin to approve you as the CR of your class.</p>
 
-                    <form action="/user/profile/request-cr" method="POST">
-
-                        <button class="btn text-white"
-                                style="background:#648c80;">
-                            Request CR
+                    <% if (roles.some(role => role.role === 'CR') || pendingRequests.some(request => request.role === 'CR')) { %>
+                        <button class="btn btn-outline-secondary" disabled>
+                            <%= roles.some(role => role.role === 'CR') ? 'CR designation assigned' : 'CR request pending' %>
                         </button>
-
-                    </form>
+                    <% } else { %>
+                        <form action="/user/profile/request-cr" method="POST">
+                            <button class="btn text-white" style="background:#648c80;">Request CR approval</button>
+                        </form>
+                    <% } %>
 
                 </div>
 
@@ -203,7 +219,7 @@
                     <h6 class="fw-semibold">General Secretary (GenSec)</h6>
 
                     <p class="text-muted small">
-                        Select a club to request its GenSec designation.
+                        Select a club to ask the admin to approve its GenSec designation.
                     </p>
 
                     <% if (currUser.clubs.length) { %>
@@ -216,8 +232,8 @@
 
                                 <% currUser.clubs.forEach(club => { %>
 
-                                    <option value="<%= club %>">
-                                        <%= club %>
+                                    <option value="<%= club %>" <%= roles.some(role => role.role === 'GenSec' && role.club === club) || pendingRequests.some(request => request.role === 'GenSec' && request.club === club) ? 'disabled' : '' %>>
+                                        <%= club %><%= roles.some(role => role.role === 'GenSec' && role.club === club) ? ' (assigned)' : pendingRequests.some(request => request.role === 'GenSec' && request.club === club) ? ' (pending)' : '' %>
                                     </option>
 
                                 <% }) %>
@@ -226,7 +242,7 @@
 
                             <button class="btn text-white"
                                     style="background:#648c80;">
-                                Request GenSec
+                                Request GenSec approval
                             </button>
 
                         </form>

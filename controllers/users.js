@@ -1,5 +1,7 @@
 const User = require('../models/user.js');
 const RoleAssignment = require('../models/roles.js');
+const RoleRequest = require('../models/roleRequest.js');
+const passport = require('passport');
 module.exports.renderSignup = (req, res) => {
     res.render('users/signup.ejs');
 };
@@ -52,7 +54,6 @@ module.exports.signup = async (req, res, next) => {
             hostel,
             clubs: clubs || [],
             studentRole: 'Student',
-            roleRequest: null,
             verified: false,
         });
         const regUser = await User.register(newUser, password);
@@ -72,8 +73,37 @@ module.exports.renderLogin = (req, res) => {
     res.render('users/login.ejs');
 };
 module.exports.login = async (req, res) => {
+    if (req.user?.accountType === 'Admin') {
+        return req.logout((error) => {
+            if (error) return res.redirect('/user/login');
+            req.flash('error', 'Please use the administrator login page.');
+            res.redirect('/user/admin/login');
+        });
+    }
     req.flash('success', 'Successfully logged in!');
     res.redirect(res.locals.redirectUrl || '/campusAwaaz');
+};
+
+module.exports.renderAdminLogin = (req, res) => {
+    if (req.user?.accountType === 'Admin') return res.redirect('/admin');
+    res.render('users/adminLogin.ejs');
+};
+
+module.exports.adminLogin = (req, res, next) => {
+    if (req.body.username) req.body.username = req.body.username.trim().toLowerCase();
+    passport.authenticate('local', (error, user) => {
+        if (error) return next(error);
+        if (!user || user.accountType !== 'Admin') {
+            req.flash('error', 'Invalid administrator email or password.');
+            return res.redirect('/user/admin/login');
+        }
+
+        req.logIn(user, (loginError) => {
+            if (loginError) return next(loginError);
+            req.flash('success', 'Administrator signed in.');
+            res.redirect('/admin');
+        });
+    })(req, res, next);
 };
 module.exports.logout = (req, res, next) => {
     req.logout((err) => {
@@ -111,14 +141,14 @@ module.exports.staffSignup = async (req, res, next) => {
     }
 };
 module.exports.renderProfile = async (req, res) => {
-    const RoleAssignment = require('../models/roles.js');
-
-    const roles = await RoleAssignment.find({
-        user: req.user._id,
-    });
+    const [roles, pendingRequests] = await Promise.all([
+        RoleAssignment.find({ user: req.user._id }),
+        RoleRequest.find({ user: req.user._id, status: 'Pending' }).sort({ createdAt: -1 }),
+    ]);
 
     res.render('users/profile.ejs', {
         roles,
+        pendingRequests,
     });
 };
 module.exports.requestCR = async (req, res) => {
@@ -129,22 +159,23 @@ module.exports.requestCR = async (req, res) => {
         return res.redirect('/user/profile');
     }
 
-    try {
-        await RoleAssignment.create({
-            user: user._id,
-            role: 'CR',
-            branch: user.branch,
-            year: user.year,
-            section: user.section.toUpperCase(),
-        });
-
-        req.flash('success', 'Congratulations! You are now the CR of your class.');
-    } catch (err) {
-        if (err.code === 11000) {
-            req.flash('error', 'Your class already has a CR.');
-        } else {
-            throw err;
-        }
+    const classScope = {
+        role: 'CR',
+        branch: user.branch,
+        year: user.year,
+        section: user.section.toUpperCase(),
+    };
+    const [existingRole, existingRequest] = await Promise.all([
+        RoleAssignment.findOne(classScope),
+        RoleRequest.findOne({ user: user._id, ...classScope, status: 'Pending' }),
+    ]);
+    if (existingRole) {
+        req.flash('error', 'Your class already has an approved CR.');
+    } else if (existingRequest) {
+        req.flash('error', 'Your CR request is already waiting for admin approval.');
+    } else {
+        await RoleRequest.create({ user: user._id, ...classScope });
+        req.flash('success', 'Your CR request was sent to the admin for approval.');
     }
 
     res.redirect('/user/profile');
@@ -158,25 +189,22 @@ module.exports.requestGenSec = async (req, res) => {
         return res.redirect('/user/profile');
     }
 
-    if (!user.clubs.includes(club)) {
+    if (!(user.clubs || []).includes(club)) {
         req.flash('error', 'You can only request GenSec for clubs you belong to.');
         return res.redirect('/user/profile');
     }
 
-    try {
-        await RoleAssignment.create({
-            user: user._id,
-            role: 'GenSec',
-            club,
-        });
-
-        req.flash('success', `You are now GenSec of ${club}!`);
-    } catch (err) {
-        if (err.code === 11000) {
-            req.flash('error', `${club} already has a GenSec.`);
-        } else {
-            throw err;
-        }
+    const [existingRole, existingRequest] = await Promise.all([
+        RoleAssignment.findOne({ role: 'GenSec', club }),
+        RoleRequest.findOne({ user: user._id, role: 'GenSec', club, status: 'Pending' }),
+    ]);
+    if (existingRole) {
+        req.flash('error', `${club} already has an approved GenSec.`);
+    } else if (existingRequest) {
+        req.flash('error', `Your GenSec request for ${club} is already waiting for admin approval.`);
+    } else {
+        await RoleRequest.create({ user: user._id, role: 'GenSec', club });
+        req.flash('success', `Your GenSec request for ${club} was sent to the admin for approval.`);
     }
 
     res.redirect('/user/profile');
@@ -192,6 +220,15 @@ module.exports.relinquishRole = async (req, res) => {
     if (!role) {
         req.flash('error', 'Designation not found.');
     } else {
+        const remainingRoles = await RoleAssignment.find({ user: req.user._id });
+        if (req.user.studentRole === role.role) {
+            req.user.studentRole = remainingRoles.some((item) => item.role === 'CR')
+                ? 'CR'
+                : remainingRoles.some((item) => item.role === 'GenSec')
+                  ? 'GenSec'
+                  : 'Student';
+            await req.user.save();
+        }
         req.flash('success', 'Designation relinquished successfully.');
     }
 

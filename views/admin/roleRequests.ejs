@@ -1,0 +1,54 @@
+<% layout("/layouts/boilerplate") -%>
+
+<main class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <p class="text-uppercase small fw-bold text-success mb-1">Administrator</p>
+            <h1 class="h2 mb-1">Designation requests</h1>
+            <p class="text-muted mb-0">Approve a request to give the student the CR or GenSec badge and access.</p>
+        </div>
+        <a href="/announcements" class="btn btn-outline-success">Manage announcements</a>
+    </div>
+
+    <% if (!requests.length) { %>
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-5 text-center">
+                <i class="fa-regular fa-circle-check fs-2 text-success"></i>
+                <h2 class="h5 mt-3">No requests waiting</h2>
+                <p class="text-muted mb-0">New student requests will appear here.</p>
+            </div>
+        </div>
+    <% } %>
+
+    <div class="row g-3">
+        <% requests.forEach(request => { %>
+            <div class="col-12">
+                <article class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <span class="badge text-bg-warning mb-2">Pending approval</span>
+                            <h2 class="h5 mb-1"><%= request.user?.name || 'Student account unavailable' %></h2>
+                            <p class="text-muted mb-2"><%= request.user?.email || '' %><%= request.user?.rollNo ? ' · ' + request.user.rollNo : '' %></p>
+                            <p class="mb-0 fw-semibold">
+                                <% if (request.role === 'CR') { %>
+                                    CR · <%= request.branch %> · Year <%= request.year %> · Section <%= request.section %>
+                                <% } else { %>
+                                    GenSec · <%= request.club %>
+                                <% } %>
+                            </p>
+                            <small class="text-muted">Requested <%= new Date(request.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <form action="/admin/role-requests/<%= request._id %>/approve" method="POST">
+                                <button class="btn btn-success">Approve</button>
+                            </form>
+                            <form action="/admin/role-requests/<%= request._id %>/reject" method="POST">
+                                <button class="btn btn-outline-danger">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        <% }) %>
+    </div>
+</main>
