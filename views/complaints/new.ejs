@@ -40,6 +40,14 @@
             </label>
 
             <label>
+                Hostel / building
+                <select name="complaint[location]" id="complaint-location" disabled>
+                    <option value="">Choose a category first</option>
+                </select>
+                <small id="complaint-location-hint">Required for lift complaints.</small>
+            </label>
+
+            <label>
                 Urgency
                 <select name="complaint[urgency]" required>
                     <option value="Low">Low</option>
@@ -87,8 +95,26 @@
         ]
     };
 
+    const locationOptions = {
+        "Hostel": ["LH", "1.8k", "Other Hostel"],
+        "Common Buildings": ["E & ICT Building", "ECE Department", "Other Common Building"]
+    };
+
     const categorySelect = document.getElementById("complaint-category");
     const subcategorySelect = document.getElementById("complaint-subcategory");
+    const locationSelect = document.getElementById("complaint-location");
+
+    function updateLocationOptions() {
+        locationSelect.innerHTML = '<option value="">Choose a hostel or building</option>';
+        (locationOptions[categorySelect.value] || []).forEach(value => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+            locationSelect.appendChild(option);
+        });
+        locationSelect.disabled = !(locationOptions[categorySelect.value] || []).length;
+        locationSelect.required = subcategorySelect.value === "Lift";
+    }
 
     categorySelect.addEventListener("change", () => {
         subcategorySelect.innerHTML = '<option value="">Choose a subcategory</option>';
@@ -101,5 +127,8 @@
         });
 
         subcategorySelect.disabled = !subcategoryOptions[categorySelect.value];
+        updateLocationOptions();
     });
+
+    subcategorySelect.addEventListener("change", updateLocationOptions);
 </script>

@@ -64,11 +64,17 @@ module.exports.create = async (req, res) => {
     }
 
     const data = req.body.complaint || {};
+    if (data.subcategory === 'Lift' && !data.location) {
+        req.flash('error', 'Choose the hostel or building for a lift complaint.');
+        return res.redirect('/complaints/new');
+    }
+
     const complaint = new Complaint({
         title: data.title,
         description: data.description,
         category: data.category,
         subcategory: data.subcategory,
+        location: data.location || '',
         urgency: data.urgency,
         visibility: data.visibility,
         createdBy: req.user._id,

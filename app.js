@@ -31,6 +31,7 @@ const LostFound = require('./models/lostfound.js');
 const announcements = require('./routes/announcement.js');
 const timetables = require('./routes/timetables.js');
 const adminRoutes = require('./routes/admin.js');
+const notifications = require('./routes/notifications.js');
 
 const port = 8080;
 
@@ -94,6 +95,9 @@ app.use('/timetables', timetables);
 
 // Admin
 app.use('/admin', adminRoutes);
+
+// Notifications
+app.use('/notifications', notifications);
 
 // Database Connection
 main()

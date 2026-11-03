@@ -26,6 +26,7 @@
                         <div class="complaint-tags">
                             <span class="complaint-tag lavender"><%= item.category %></span>
                             <span class="complaint-tag blue"><%= item.subcategory %></span>
+                            <% if (item.location) { %><span class="complaint-tag blue"><%= item.location %></span><% } %>
                             <span class="complaint-tag mint"><%= item.status %></span>
                             <span class="complaint-tag peach"><%= item.visibility %></span>
                         </div>

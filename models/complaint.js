@@ -17,6 +17,11 @@ const complaintSchema = new mongoose.Schema(
         description: { type: String, required: true, trim: true, maxlength: 5000 },
         category: { type: String, enum: Object.keys(subcategories), required: true },
         subcategory: { type: String, required: true },
+        location: {
+            type: String,
+            enum: ['', 'LH', '1.8k', 'E & ICT Building', 'ECE Department', 'Other Hostel', 'Other Common Building'],
+            default: '',
+        },
         urgency: {
             type: String,
             enum: ['Low', 'Medium', 'High'],
@@ -58,6 +63,17 @@ const complaintSchema = new mongoose.Schema(
 complaintSchema.path('subcategory').validate(function (value) {
     return subcategories[this.category]?.includes(value);
 }, 'Choose a subcategory valid for the selected category.');
+
+complaintSchema.path('location').validate(function (value) {
+    if (this.subcategory === 'Lift' && !value) return false;
+    if (!value) return true;
+
+    const hostelLocations = ['LH', '1.8k', 'Other Hostel'];
+    const commonBuildingLocations = ['E & ICT Building', 'ECE Department', 'Other Common Building'];
+    return this.category === 'Hostel'
+        ? hostelLocations.includes(value)
+        : this.category === 'Common Buildings' && commonBuildingLocations.includes(value);
+}, 'Choose a location valid for the complaint category. Lift complaints need a location.');
 
 complaintSchema.index({ visibility: 1, category: 1, subcategory: 1, urgency: 1, createdAt: -1 });
 

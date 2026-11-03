@@ -1,5 +1,7 @@
 const Announcement = require('../models/announcement.js');
+const Notification = require('../models/notification.js');
 const RoleAssignment = require('../models/roles.js');
+const User = require('../models/user.js');
 const { cloudinary } = require('../cloudConfig.js');
 const Timetable = require('../models/timetable.js');
 
@@ -362,6 +364,24 @@ module.exports.create = async (req, res) => {
     const announcement = new Announcement(newAnnouncement);
 
     await announcement.save();
+
+    if (announcement.scope === 'Club' && announcement.club) {
+        const members = await User.find({
+            accountType: 'Student',
+            clubs: announcement.club,
+        }).select('_id');
+
+        if (members.length) {
+            await Notification.insertMany(
+                members.map((member) => ({
+                    recipient: member._id,
+                    announcement: announcement._id,
+                    notificationType: 'Announcement',
+                    message: `New announcement in ${announcement.club}: ${announcement.title}`,
+                }))
+            );
+        }
+    }
 
     req.flash('success', 'Announcement published successfully!');
 

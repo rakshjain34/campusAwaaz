@@ -1,14 +1,18 @@
 const Shop = require('../models/shop.js');
 const EV = require('../models/ev.js');
+const { getLiftStatuses } = require('./lifts.js');
 
 module.exports.renderNewForm = (req, res) => {
     res.render('pages/newShop.ejs');
 };
 
 module.exports.index = async (req, res) => {
-    const shops = await Shop.find({});
-    const evs = await EV.find({});
-    res.render('pages/services.ejs', { shops, evs });
+    const [shops, evs, liftStatuses] = await Promise.all([
+        Shop.find({}),
+        EV.find({}),
+        getLiftStatuses(),
+    ]);
+    res.render('pages/services.ejs', { shops, evs, liftStatuses });
 };
 
 module.exports.createShop = async (req, res) => {

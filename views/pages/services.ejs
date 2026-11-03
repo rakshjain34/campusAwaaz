@@ -137,6 +137,36 @@
     </section>
 
 
+    <!-- LIFT STATUS FROM QUALIFYING CAMPUS COMPLAINTS -->
+
+    <section class="services-section" aria-labelledby="lift-status-heading">
+        <div class="services-section-heading">
+            <div>
+                <span class="services-eyebrow">LIVE STATUS</span>
+                <h2 id="lift-status-heading">Campus lifts</h2>
+                <p class="lift-status-note">A lift is marked broken when an active public lift complaint for its location has at least four upvotes. Refreshes automatically.</p>
+            </div>
+        </div>
+
+        <div class="services-grid lift-status-grid" aria-live="polite">
+            <% liftStatuses.forEach(lift => { %>
+                <article class="service-card lift-status-card" data-lift-id="<%= lift.id %>">
+                    <div class="service-card-top">
+                        <div class="service-shop-icon" aria-hidden="true"><i class="fa-solid fa-building"></i></div>
+                        <span class="service-status <%= lift.status === 'Working' ? 'is-open' : 'is-closed' %> lift-status-pill" data-lift-status>
+                            <span class="service-status-dot"></span>
+                            <span data-lift-label><%= lift.status %></span>
+                        </span>
+                    </div>
+                    <h3><%= lift.location %> lift</h3>
+                    <p class="service-description">Status is based on current, public lift complaints for this location.</p>
+                    <a class="lift-complaints-link" href="<%= lift.complaintUrl %>">View lift complaints →</a>
+                </article>
+            <% }) %>
+        </div>
+    </section>
+
+
     <!-- CAMPUS EV LIVE TRACKING -->
 
     <section class="services-section" aria-labelledby="ev-heading">
@@ -239,6 +269,7 @@
 <!-- LEAFLET MAP LIBRARY -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/lift-status.js"></script>
 
 
 <script>

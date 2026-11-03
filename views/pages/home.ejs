@@ -181,7 +181,7 @@
                                             <div class="post-author">
 
                                                 <span class="category-badge peach">
-                                                    <%= complaint.category %> · <%= complaint.subcategory %>
+                                                    <%= complaint.category %> · <%= complaint.subcategory %><%= complaint.location ? ' · ' + complaint.location : '' %>
                                                 </span>
 
                                                 <h5>
@@ -254,7 +254,7 @@
                                             <div class="post-author">
 
                                                 <span class="category-badge peach">
-                                                    <%= complaint.category %> · <%= complaint.subcategory %>
+                                                    <%= complaint.category %> · <%= complaint.subcategory %><%= complaint.location ? ' · ' + complaint.location : '' %>
                                                 </span>
 
                                                 <h5>

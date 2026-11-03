@@ -10,7 +10,17 @@ const notificationSchema = new mongoose.Schema(
         complaint: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Complaint',
-            required: true,
+            default: null,
+        },
+        announcement: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Announcement',
+            default: null,
+        },
+        notificationType: {
+            type: String,
+            enum: ['Complaint', 'Announcement'],
+            default: 'Complaint',
         },
         message: {
             type: String,
@@ -23,5 +33,7 @@ const notificationSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+notificationSchema.index({ recipient: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

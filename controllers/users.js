@@ -73,6 +73,10 @@ module.exports.renderLogin = (req, res) => {
     res.render('users/login.ejs');
 };
 module.exports.login = async (req, res) => {
+    const redirectUrl = res.locals.redirectUrl;
+    // A stale redirect to the EV JSON endpoint would display raw JSON after login.
+    delete req.session.redirectUrl;
+
     if (req.user?.accountType === 'Admin') {
         return req.logout((error) => {
             if (error) return res.redirect('/user/login');
@@ -81,7 +85,8 @@ module.exports.login = async (req, res) => {
         });
     }
     req.flash('success', 'Successfully logged in!');
-    res.redirect(res.locals.redirectUrl || '/campusAwaaz');
+    const isEvApiUrl = typeof redirectUrl === 'string' && /^\/services\/ev\/[^/?]+(?:\?.*)?$/.test(redirectUrl);
+    res.redirect(isEvApiUrl ? '/campusAwaaz' : (redirectUrl || '/campusAwaaz'));
 };
 
 module.exports.renderAdminLogin = (req, res) => {

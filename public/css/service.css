@@ -162,6 +162,26 @@
     background: currentColor;
 }
 
+.lift-status-note {
+    margin: 8px 0 0;
+    color: var(--services-muted);
+    font-size: 0.9rem;
+}
+
+.lift-status-card {
+    min-height: 215px;
+}
+
+.lift-complaints-link {
+    color: var(--services-primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.lift-complaints-link:hover {
+    text-decoration: underline;
+}
+
 .service-card h3 {
     margin: 0 0 7px;
     color: var(--services-text);

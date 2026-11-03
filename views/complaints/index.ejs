@@ -79,6 +79,7 @@
                             <div class="complaint-tags">
                                 <span class="complaint-tag lavender"><%= item.category %></span>
                                 <span class="complaint-tag blue"><%= item.subcategory %></span>
+                                <% if (item.location) { %><span class="complaint-tag blue"><%= item.location %></span><% } %>
                                 <span class="complaint-tag urgency-<%= item.urgency.toLowerCase() %>">
                                     <%= item.urgency %> urgency
                                 </span>
